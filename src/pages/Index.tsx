@@ -88,92 +88,107 @@ export default function Index() {
           <p className="text-xl text-muted-foreground">
             Share encrypted messages with confidence. Your privacy, your control.
           </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Button size="lg" onClick={handleGetStarted} className="gap-2">
-              <Key className="h-5 w-5" />
-              Start Encrypting
-            </Button>
-            {isInstallable && !isIOS && (
-              <Button size="lg" variant="outline" onClick={handleInstall} className="gap-2">
-                <Smartphone className="h-5 w-5" />
-                Install App
-              </Button>
-            )}
-          </div>
         </div>
       </section>
 
-      {/* How to Use Section */}
+      {/* How to Use + CTA Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h3 className="text-3xl font-bold mb-4">How to Use Zinger</h3>
-              <p className="text-lg text-muted-foreground">
-                Simple steps to start encrypting your messages
-              </p>
-            </div>
-
-            <div className="space-y-8">
-              <div className="flex gap-6 items-start">
-                <div className="flex-shrink-0 h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
-                  1
-                </div>
-                <div>
-                  <h4 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                    <UserPlus className="h-5 w-5" />
-                    Sign In with Google
-                  </h4>
-                  <p className="text-muted-foreground">
-                    Create your account using Google OAuth. Your encryption keys are automatically generated and secured.
+          <div className="max-w-6xl mx-auto">
+            <div className="grid lg:grid-cols-[2fr,1fr] gap-8">
+              {/* How to Use */}
+              <div>
+                <div className="mb-8">
+                  <h3 className="text-3xl font-bold mb-4">How to Use Zinger</h3>
+                  <p className="text-lg text-muted-foreground">
+                    Simple steps to start encrypting your messages
                   </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="flex gap-4 items-start">
+                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                      1
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-semibold mb-1 flex items-center gap-2">
+                        <UserPlus className="h-5 w-5" />
+                        Sign In with Google
+                      </h4>
+                      <p className="text-muted-foreground text-sm">
+                        Create your account using Google OAuth. Your encryption keys are automatically generated and secured.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 items-start">
+                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                      2
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-semibold mb-1 flex items-center gap-2">
+                        <Mail className="h-5 w-5" />
+                        Add Confides
+                      </h4>
+                      <p className="text-muted-foreground text-sm">
+                        Send confide requests to people you trust. Once accepted, you can exchange encrypted messages.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 items-start">
+                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                      3
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-semibold mb-1 flex items-center gap-2">
+                        <Lock className="h-5 w-5" />
+                        Encrypt Messages
+                      </h4>
+                      <p className="text-muted-foreground text-sm">
+                        Type your message and select a confide. The message is encrypted locally on your device.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 items-start">
+                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                      4
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-semibold mb-1 flex items-center gap-2">
+                        <Share2 className="h-5 w-5" />
+                        Share Encrypted Text
+                      </h4>
+                      <p className="text-muted-foreground text-sm">
+                        Copy the encrypted text and send it through any channel - email, chat, SMS. Only your confide can decrypt it.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex gap-6 items-start">
-                <div className="flex-shrink-0 h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
-                  2
-                </div>
-                <div>
-                  <h4 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                    <Mail className="h-5 w-5" />
-                    Add Confides
-                  </h4>
-                  <p className="text-muted-foreground">
-                    Send confide requests to people you trust. Once accepted, you can exchange encrypted messages.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-6 items-start">
-                <div className="flex-shrink-0 h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
-                  3
-                </div>
-                <div>
-                  <h4 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                    <Lock className="h-5 w-5" />
-                    Encrypt Messages
-                  </h4>
-                  <p className="text-muted-foreground">
-                    Type your message and select a confide. The message is encrypted locally on your device.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-6 items-start">
-                <div className="flex-shrink-0 h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
-                  4
-                </div>
-                <div>
-                  <h4 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                    <Share2 className="h-5 w-5" />
-                    Share Encrypted Text
-                  </h4>
-                  <p className="text-muted-foreground">
-                    Copy the encrypted text and send it through any channel - email, chat, SMS. Only your confide can decrypt it.
-                  </p>
-                </div>
-              </div>
+              {/* CTA Card */}
+              <Card className="h-fit sticky top-24">
+                <CardHeader>
+                  <CardTitle>Get Started</CardTitle>
+                  <CardDescription>
+                    Start encrypting your messages securely
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Button size="lg" onClick={handleGetStarted} className="w-full gap-2">
+                    <Key className="h-5 w-5" />
+                    Start Encrypting
+                  </Button>
+                  {isInstallable && !isIOS && (
+                    <Button size="lg" variant="outline" onClick={handleInstall} className="w-full gap-2">
+                      <Smartphone className="h-5 w-5" />
+                      Install App
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
