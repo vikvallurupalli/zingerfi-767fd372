@@ -22,7 +22,7 @@ export function Layout({ children }: LayoutProps) {
   const location = useLocation();
 
   const navItems = [
-    { path: "/", icon: Shield, label: "Dashboard" },
+    { path: "/dashboard", icon: Shield, label: "Dashboard" },
     { path: "/encrypt", icon: Lock, label: "Encrypt" },
     { path: "/decrypt", icon: Unlock, label: "Decrypt" },
     { path: "/confides", icon: Users, label: "Confides" },
