@@ -53,34 +53,11 @@ export default function IncomingRequests() {
   const handleAccept = async (requestId: string, senderId: string) => {
     setLoading(true);
     try {
-      // Create bidirectional confide relationships
-      const { error: confideError1 } = await supabase
-        .from("confides")
-        .insert({
-          user_id: user?.id,
-          confide_user_id: senderId,
-          status: "accepted",
-        });
+      const { error } = await supabase.rpc("accept_confide_request", {
+        request_id: requestId,
+      });
 
-      if (confideError1) throw confideError1;
-
-      const { error: confideError2 } = await supabase
-        .from("confides")
-        .insert({
-          user_id: senderId,
-          confide_user_id: user?.id,
-          status: "accepted",
-        });
-
-      if (confideError2) throw confideError2;
-
-      // Update request status
-      const { error: updateError } = await supabase
-        .from("confide_requests")
-        .update({ status: "accepted" })
-        .eq("id", requestId);
-
-      if (updateError) throw updateError;
+      if (error) throw error;
 
       toast.success("Request accepted! You can now exchange encrypted messages.");
       loadRequests();
