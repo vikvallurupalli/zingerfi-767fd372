@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,8 +6,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
 import { Unlock, Copy, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   decryptMessage,
   importPublicKey,
@@ -16,12 +22,50 @@ import {
 } from "@/lib/crypto";
 import { supabase } from "@/integrations/supabase/client";
 
+interface Confide {
+  id: string;
+  confide_user_id: string;
+  alias: string | null;
+  profiles: {
+    email: string;
+  };
+}
+
 export default function Decrypt() {
   const { user } = useAuth();
   const [senderEmail, setSenderEmail] = useState("");
   const [encryptedText, setEncryptedText] = useState("");
   const [decryptedMessage, setDecryptedMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [confides, setConfides] = useState<Confide[]>([]);
+
+  useEffect(() => {
+    loadConfides();
+  }, [user]);
+
+  const loadConfides = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("confides")
+      .select(`
+        id,
+        confide_user_id,
+        alias,
+        profiles!confides_confide_user_id_fkey (
+          email
+        )
+      `)
+      .eq("user_id", user.id)
+      .order("alias", { ascending: true, nullsFirst: false });
+
+    if (error) {
+      console.error("Error loading confides:", error);
+      return;
+    }
+
+    setConfides(data as any || []);
+  };
 
   const handleDecrypt = async () => {
     if (!encryptedText || !senderEmail || !user) {
@@ -94,19 +138,29 @@ export default function Decrypt() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Sender Email</CardTitle>
-            <CardDescription>Enter the email of the person who sent you this message</CardDescription>
+            <CardTitle>Select Sender</CardTitle>
+            <CardDescription>Choose the confide who sent you this message</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <Label htmlFor="sender-email">Sender Email Address</Label>
-              <Input
-                id="sender-email"
-                type="email"
-                placeholder="sender@example.com"
-                value={senderEmail}
-                onChange={(e) => setSenderEmail(e.target.value)}
-              />
+              <Label htmlFor="sender-select">Sender</Label>
+              <Select value={senderEmail} onValueChange={setSenderEmail}>
+                <SelectTrigger id="sender-select">
+                  <SelectValue placeholder="Select a confide..." />
+                </SelectTrigger>
+                <SelectContent className="bg-background">
+                  {confides.map((confide) => (
+                    <SelectItem key={confide.id} value={confide.profiles.email}>
+                      {confide.alias || confide.profiles.email}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {confides.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No confides found. Add confides to decrypt messages.
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
