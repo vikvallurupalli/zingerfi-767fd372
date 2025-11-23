@@ -103,58 +103,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* About Section */}
-      <section className="bg-muted/30 py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h3 className="text-3xl font-bold mb-4">About Zinger</h3>
-              <p className="text-lg text-muted-foreground">
-                A secure encryption tool designed for privacy-conscious users
-              </p>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader>
-                  <Lock className="h-10 w-10 text-primary mb-2" />
-                  <CardTitle>End-to-End Encrypted</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>
-                    Your messages are encrypted using ECC-256 cryptography. Only you and your confides can read them.
-                  </CardDescription>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <Shield className="h-10 w-10 text-primary mb-2" />
-                  <CardTitle>No Message Storage</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>
-                    We don't store your messages. Encrypt locally, share externally, and decrypt on your device.
-                  </CardDescription>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <Users className="h-10 w-10 text-primary mb-2" />
-                  <CardTitle>Confide Network</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>
-                    Build your trusted network of confides. Only exchange encrypted messages with approved contacts.
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* How to Use Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
@@ -226,6 +174,58 @@ export default function Index() {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className="bg-muted/30 py-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h3 className="text-3xl font-bold mb-4">About Zinger</h3>
+              <p className="text-lg text-muted-foreground">
+                A secure encryption tool designed for privacy-conscious users
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader>
+                  <Lock className="h-10 w-10 text-primary mb-2" />
+                  <CardTitle>End-to-End Encrypted</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Your messages are encrypted using ECC-256 cryptography. Only you and your confides can read them.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <Shield className="h-10 w-10 text-primary mb-2" />
+                  <CardTitle>No Message Storage</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    We don't store your messages. Encrypt locally, share externally, and decrypt on your device.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <Users className="h-10 w-10 text-primary mb-2" />
+                  <CardTitle>Confide Network</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Build your trusted network of confides. Only exchange encrypted messages with approved contacts.
+                  </CardDescription>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
