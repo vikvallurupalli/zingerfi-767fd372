@@ -80,7 +80,7 @@ export default function Index() {
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 text-center">
+      <section className="container mx-auto px-4 pt-20 pb-8 text-center">
         <div className="max-w-3xl mx-auto space-y-6">
           <h2 className="text-5xl font-bold tracking-tight">
             Secure End-to-End Encryption
@@ -92,7 +92,7 @@ export default function Index() {
       </section>
 
       {/* How to Use + CTA Section */}
-      <section className="py-20">
+      <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="grid lg:grid-cols-[2fr,1fr] gap-8">
