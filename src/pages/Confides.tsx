@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Users, Trash2, Edit2, Save, X } from "lucide-react";
+import { Users, Trash2, Edit2, Save, X, UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface Confide {
   id: string;
@@ -19,6 +20,7 @@ interface Confide {
 
 export default function Confides() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [confides, setConfides] = useState<Confide[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editAlias, setEditAlias] = useState("");
@@ -124,6 +126,14 @@ export default function Confides() {
           <p className="text-muted-foreground">
             Manage your trusted confide list and set aliases
           </p>
+          <Button 
+            onClick={() => navigate("/send-request")} 
+            className="gap-2 mt-4"
+            size="lg"
+          >
+            <UserPlus className="h-5 w-5" />
+            Add Confidee
+          </Button>
         </div>
 
         <Card>
