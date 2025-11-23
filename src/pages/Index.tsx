@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Lock, Users, Smartphone, Share2, UserPlus, Mail, Key } from "lucide-react";
+import { Shield, Lock, Users, Smartphone, Share2, UserPlus, Mail, Key, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Index() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isInstallable, setIsInstallable] = useState(false);
@@ -60,9 +60,22 @@ export default function Index() {
             </div>
             <h1 className="text-2xl font-bold">Zinger</h1>
           </div>
-          <Button onClick={handleGetStarted}>
-            {user ? "Go to Dashboard" : "Get Started"}
-          </Button>
+          <div className="flex items-center gap-2">
+            {user && (
+              <span className="text-sm text-muted-foreground hidden md:inline">
+                {user.email}
+              </span>
+            )}
+            <Button onClick={handleGetStarted}>
+              {user ? "Go to Dashboard" : "Get Started"}
+            </Button>
+            {user && (
+              <Button variant="outline" onClick={signOut} className="gap-2">
+                <LogOut className="h-4 w-4" />
+                <span className="hidden md:inline">Logout</span>
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
