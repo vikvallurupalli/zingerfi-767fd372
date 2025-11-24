@@ -7,28 +7,17 @@ import { Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
-const Auth = () => {
+export default function Auth() {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate("/dashboard");
-      }
-    });
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate("/dashboard");
-      }
-    });
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
   
   const handleGoogleLogin = async () => {
     try {
