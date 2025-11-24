@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Lock, Copy, Trash2 } from "lucide-react";
+import { Lock, Copy, Trash2, MessageSquare, Send } from "lucide-react";
 import { toast } from "sonner";
 import {
   encryptMessage,
@@ -106,6 +106,25 @@ export default function Encrypt() {
     setSelectedConfide("");
   };
 
+  const createShareLink = () => {
+    return `https://zinger.snitchon.org/decrypt?message=${encodeURIComponent(encryptedText)}`;
+  };
+
+  const handleSMS = () => {
+    const link = createShareLink();
+    window.location.href = `sms:?body=${encodeURIComponent(link)}`;
+  };
+
+  const handleWhatsApp = () => {
+    const link = createShareLink();
+    window.location.href = `https://wa.me/?text=${encodeURIComponent(link)}`;
+  };
+
+  const handleTelegram = () => {
+    const link = createShareLink();
+    window.location.href = `https://t.me/share/url?url=${encodeURIComponent(link)}`;
+  };
+
   return (
     <Layout>
       <div className="max-w-4xl mx-auto space-y-6">
@@ -196,6 +215,20 @@ export default function Encrypt() {
                 <Copy className="h-4 w-4" />
                 Copy to Clipboard
               </Button>
+              <div className="grid grid-cols-3 gap-2 mt-2">
+                <Button onClick={handleSMS} variant="outline" className="gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  SMS
+                </Button>
+                <Button onClick={handleWhatsApp} variant="outline" className="gap-2">
+                  <Send className="h-4 w-4" />
+                  WhatsApp
+                </Button>
+                <Button onClick={handleTelegram} variant="outline" className="gap-2">
+                  <Send className="h-4 w-4" />
+                  Telegram
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}

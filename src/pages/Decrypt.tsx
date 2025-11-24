@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ interface Confide {
 
 export default function Decrypt() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [senderEmail, setSenderEmail] = useState("");
   const [encryptedText, setEncryptedText] = useState("");
   const [decryptedMessage, setDecryptedMessage] = useState("");
@@ -41,7 +43,13 @@ export default function Decrypt() {
 
   useEffect(() => {
     loadConfides();
-  }, [user]);
+    
+    // Check for encrypted message in URL
+    const messageFromUrl = searchParams.get("message");
+    if (messageFromUrl) {
+      setEncryptedText(decodeURIComponent(messageFromUrl));
+    }
+  }, [user, searchParams]);
 
   const loadConfides = async () => {
     if (!user) return;
