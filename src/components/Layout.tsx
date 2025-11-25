@@ -1,7 +1,9 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Lock,
   Unlock,
@@ -20,6 +22,53 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const { signOut, user } = useAuth();
   const location = useLocation();
+  const [incomingCount, setIncomingCount] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const loadCounts = async () => {
+      // Count incoming requests
+      const { count: incoming } = await supabase
+        .from("confide_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("receiver_id", user.id)
+        .eq("status", "pending");
+
+      // Count pending (outgoing) requests
+      const { count: pending } = await supabase
+        .from("confide_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("sender_id", user.id)
+        .eq("status", "pending");
+
+      setIncomingCount(incoming || 0);
+      setPendingCount(pending || 0);
+    };
+
+    loadCounts();
+
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel("confide_requests_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "confide_requests",
+        },
+        () => {
+          loadCounts();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
 
   const navItems = [
     { path: "/dashboard", icon: Shield, label: "Dashboard" },
@@ -27,8 +76,8 @@ export function Layout({ children }: LayoutProps) {
     { path: "/decrypt", icon: Unlock, label: "Decrypt" },
     { path: "/confides", icon: Users, label: "Confides" },
     { path: "/send-request", icon: Send, label: "Send Request" },
-    { path: "/pending-requests", icon: Clock, label: "Pending" },
-    { path: "/incoming-requests", icon: Inbox, label: "Incoming" },
+    { path: "/pending-requests", icon: Clock, label: "Pending", count: pendingCount },
+    { path: "/incoming-requests", icon: Inbox, label: "Incoming", count: incomingCount },
   ];
 
   return (
@@ -50,10 +99,18 @@ export function Layout({ children }: LayoutProps) {
                     <Button
                       variant={isActive ? "default" : "ghost"}
                       size="sm"
-                      className="gap-2"
+                      className="gap-2 relative"
                     >
                       <Icon className="h-4 w-4" />
                       <span className="hidden md:inline">{item.label}</span>
+                      {item.count !== undefined && item.count > 0 && (
+                        <Badge 
+                          variant="destructive" 
+                          className="ml-1 h-5 min-w-5 px-1 text-xs"
+                        >
+                          {item.count}
+                        </Badge>
+                      )}
                     </Button>
                   </Link>
                 );
