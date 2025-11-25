@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           id: string
           receiver_id: string
+          sender_alias: string | null
           sender_id: string
           status: string
         }
@@ -26,6 +27,7 @@ export type Database = {
           created_at?: string
           id?: string
           receiver_id: string
+          sender_alias?: string | null
           sender_id: string
           status?: string
         }
@@ -33,6 +35,7 @@ export type Database = {
           created_at?: string
           id?: string
           receiver_id?: string
+          sender_alias?: string | null
           sender_id?: string
           status?: string
         }
@@ -124,10 +127,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      accept_confide_request: {
-        Args: { request_id: string }
-        Returns: undefined
-      }
+      accept_confide_request:
+        | { Args: { request_id: string }; Returns: undefined }
+        | {
+            Args: { receiver_alias?: string; request_id: string }
+            Returns: undefined
+          }
       delete_confide: {
         Args: { confide_user_id_param: string }
         Returns: undefined

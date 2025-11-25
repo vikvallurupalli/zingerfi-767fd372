@@ -2,6 +2,16 @@ import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Inbox, Check, X } from "lucide-react";
@@ -11,6 +21,7 @@ interface IncomingRequest {
   id: string;
   sender_id: string;
   created_at: string;
+  sender_alias: string | null;
   profiles: {
     email: string;
   };
@@ -20,6 +31,9 @@ export default function IncomingRequests() {
   const { user } = useAuth();
   const [requests, setRequests] = useState<IncomingRequest[]>([]);
   const [loading, setLoading] = useState(false);
+  const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<IncomingRequest | null>(null);
+  const [receiverAlias, setReceiverAlias] = useState("");
 
   useEffect(() => {
     loadRequests();
@@ -34,6 +48,7 @@ export default function IncomingRequests() {
         id,
         sender_id,
         created_at,
+        sender_alias,
         profiles!confide_requests_sender_id_fkey (
           email
         )
@@ -50,16 +65,28 @@ export default function IncomingRequests() {
     setRequests(data as any || []);
   };
 
-  const handleAccept = async (requestId: string, senderId: string) => {
+  const handleAcceptClick = (request: IncomingRequest) => {
+    setSelectedRequest(request);
+    setReceiverAlias("");
+    setAcceptDialogOpen(true);
+  };
+
+  const handleAcceptConfirm = async () => {
+    if (!selectedRequest) return;
+
     setLoading(true);
     try {
       const { error } = await supabase.rpc("accept_confide_request", {
-        request_id: requestId,
+        request_id: selectedRequest.id,
+        receiver_alias: receiverAlias || null,
       });
 
       if (error) throw error;
 
       toast.success("Request accepted! You can now exchange encrypted messages.");
+      setAcceptDialogOpen(false);
+      setSelectedRequest(null);
+      setReceiverAlias("");
       loadRequests();
     } catch (error) {
       console.error("Accept request error:", error);
@@ -141,6 +168,11 @@ export default function IncomingRequests() {
                   >
                     <div>
                       <p className="font-semibold">{request.profiles.email}</p>
+                      {request.sender_alias && (
+                        <p className="text-sm text-primary">
+                          They will call you: {request.sender_alias}
+                        </p>
+                      )}
                       <p className="text-sm text-muted-foreground">
                         Received: {formatDate(request.created_at)}
                       </p>
@@ -148,7 +180,7 @@ export default function IncomingRequests() {
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        onClick={() => handleAccept(request.id, request.sender_id)}
+                        onClick={() => handleAcceptClick(request)}
                         disabled={loading}
                         className="gap-2"
                       >
@@ -173,6 +205,50 @@ export default function IncomingRequests() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={acceptDialogOpen} onOpenChange={setAcceptDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Accept Request</DialogTitle>
+            <DialogDescription>
+              Accept request from <strong>{selectedRequest?.profiles.email}</strong>
+              {selectedRequest?.sender_alias && (
+                <span className="block mt-2 text-primary">
+                  They will call you: {selectedRequest.sender_alias}
+                </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="receiverAlias">Your Alias for Them (Optional)</Label>
+              <Input
+                id="receiverAlias"
+                type="text"
+                placeholder="e.g., Best Friend, Mom, Work Partner"
+                value={receiverAlias}
+                onChange={(e) => setReceiverAlias(e.target.value)}
+                maxLength={100}
+              />
+              <p className="text-sm text-muted-foreground">
+                Give them a nickname that only you will see
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setAcceptDialogOpen(false)}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleAcceptConfirm} disabled={loading}>
+              {loading ? "Accepting..." : "Accept"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

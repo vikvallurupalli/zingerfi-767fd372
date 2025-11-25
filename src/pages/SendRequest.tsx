@@ -12,6 +12,7 @@ import { toast } from "sonner";
 export default function SendRequest() {
   const { user } = useAuth();
   const [email, setEmail] = useState("");
+  const [alias, setAlias] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSendRequest = async (e: React.FormEvent) => {
@@ -90,6 +91,7 @@ export default function SendRequest() {
           sender_id: user.id,
           receiver_id: receiverProfile.id,
           status: "pending",
+          sender_alias: alias || null,
         });
 
       if (requestError) {
@@ -99,6 +101,7 @@ export default function SendRequest() {
 
       toast.success("Request sent successfully");
       setEmail("");
+      setAlias("");
     } catch (error: any) {
       console.error("Send request error:", error);
       toast.error("Failed to send request: " + (error?.message || "Unknown error"));
@@ -143,6 +146,21 @@ export default function SendRequest() {
                 />
                 <p className="text-sm text-muted-foreground">
                   The recipient will receive a notification about your request
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="alias">Alias (Optional)</Label>
+                <Input
+                  id="alias"
+                  type="text"
+                  placeholder="e.g., Best Friend, Mom, Work Partner"
+                  value={alias}
+                  onChange={(e) => setAlias(e.target.value)}
+                  maxLength={100}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Give this person a nickname that only you will see
                 </p>
               </div>
 
