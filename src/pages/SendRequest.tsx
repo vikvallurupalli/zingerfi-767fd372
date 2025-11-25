@@ -36,35 +36,50 @@ export default function SendRequest() {
         .eq("email", email)
         .maybeSingle();
 
-      if (receiverError || !receiverProfile) {
+      if (receiverError) {
+        console.error("Error checking user:", receiverError);
+        toast.error("Error checking user: " + receiverError.message);
+        return;
+      }
+
+      if (!receiverProfile) {
         toast.error("User not found with this email address");
         return;
       }
 
-      // Check if already confides
-      const { data: existingConfide } = await supabase
+      // Check if already confides (both directions)
+      const { data: existingConfide, error: confideCheckError } = await supabase
         .from("confides")
         .select("id")
-        .eq("user_id", user.id)
-        .eq("confide_user_id", receiverProfile.id)
+        .or(`and(user_id.eq.${user.id},confide_user_id.eq.${receiverProfile.id}),and(user_id.eq.${receiverProfile.id},confide_user_id.eq.${user.id})`)
         .maybeSingle();
+
+      if (confideCheckError) {
+        console.error("Error checking confides:", confideCheckError);
+      }
 
       if (existingConfide) {
         toast.error("This user is already in your confide list");
         return;
       }
 
-      // Check if request already exists
-      const { data: existingRequest } = await supabase
+      // Check if request already exists (both directions)
+      const { data: existingRequest, error: requestCheckError } = await supabase
         .from("confide_requests")
-        .select("id")
-        .eq("sender_id", user.id)
-        .eq("receiver_id", receiverProfile.id)
-        .eq("status", "pending")
+        .select("id, status")
+        .or(`and(sender_id.eq.${user.id},receiver_id.eq.${receiverProfile.id}),and(sender_id.eq.${receiverProfile.id},receiver_id.eq.${user.id})`)
         .maybeSingle();
 
+      if (requestCheckError) {
+        console.error("Error checking requests:", requestCheckError);
+      }
+
       if (existingRequest) {
-        toast.error("You already have a pending request to this user");
+        if (existingRequest.status === "pending") {
+          toast.error("A pending request already exists with this user");
+        } else {
+          toast.error("A request already exists with this user");
+        }
         return;
       }
 
@@ -77,13 +92,16 @@ export default function SendRequest() {
           status: "pending",
         });
 
-      if (requestError) throw requestError;
+      if (requestError) {
+        console.error("Error creating request:", requestError);
+        throw requestError;
+      }
 
       toast.success("Request sent successfully");
       setEmail("");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Send request error:", error);
-      toast.error("Failed to send request");
+      toast.error("Failed to send request: " + (error?.message || "Unknown error"));
     } finally {
       setLoading(false);
     }
