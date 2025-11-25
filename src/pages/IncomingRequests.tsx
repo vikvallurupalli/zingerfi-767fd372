@@ -168,11 +168,6 @@ export default function IncomingRequests() {
                   >
                     <div>
                       <p className="font-semibold">{request.profiles.email}</p>
-                      {request.sender_alias && (
-                        <p className="text-sm text-primary">
-                          They will call you: {request.sender_alias}
-                        </p>
-                      )}
                       <p className="text-sm text-muted-foreground">
                         Received: {formatDate(request.created_at)}
                       </p>
@@ -212,11 +207,6 @@ export default function IncomingRequests() {
             <DialogTitle>Accept Request</DialogTitle>
             <DialogDescription>
               Accept request from <strong>{selectedRequest?.profiles.email}</strong>
-              {selectedRequest?.sender_alias && (
-                <span className="block mt-2 text-primary">
-                  They will call you: {selectedRequest.sender_alias}
-                </span>
-              )}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
