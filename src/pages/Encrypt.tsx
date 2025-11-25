@@ -199,23 +199,11 @@ export default function Encrypt() {
         {encryptedText && (
           <Card className="border-primary/50">
             <CardHeader>
-              <CardTitle>Encrypted Message</CardTitle>
-              <CardDescription>Copy this text and send it via any channel</CardDescription>
+              <CardTitle>Message Encrypted Successfully</CardTitle>
+              <CardDescription>Use the following buttons to send your encrypted message to your confidee</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="relative">
-                <Textarea
-                  value={encryptedText}
-                  readOnly
-                  rows={8}
-                  className="resize-none font-mono-encrypted text-xs break-all"
-                />
-              </div>
-              <Button onClick={handleCopy} className="w-full gap-2">
-                <Copy className="h-4 w-4" />
-                Copy to Clipboard
-              </Button>
-              <div className="grid grid-cols-3 gap-2 mt-2">
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-3 gap-3">
                 <Button onClick={handleSMS} variant="outline" className="gap-2">
                   <MessageSquare className="h-4 w-4" />
                   SMS
@@ -229,6 +217,10 @@ export default function Encrypt() {
                   Telegram
                 </Button>
               </div>
+              <Button onClick={handleCopy} variant="secondary" className="w-full gap-2">
+                <Copy className="h-4 w-4" />
+                Copy to Send Other Ways
+              </Button>
             </CardContent>
           </Card>
         )}
