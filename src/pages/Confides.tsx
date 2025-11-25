@@ -3,6 +3,16 @@ import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Users, Trash2, Edit2, Save, X, UserPlus } from "lucide-react";
@@ -25,6 +35,8 @@ export default function Confides() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editAlias, setEditAlias] = useState("");
   const [loading, setLoading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [confideToDelete, setConfideToDelete] = useState<{ id: string; userId: string; displayName: string } | null>(null);
 
   useEffect(() => {
     loadConfides();
@@ -84,19 +96,30 @@ export default function Confides() {
     setEditAlias("");
   };
 
-  const handleDelete = async (confideId: string, confideUserId: string) => {
-    if (!confirm("Are you sure you want to remove this confide?")) return;
+  const handleDeleteClick = (confide: Confide) => {
+    setConfideToDelete({
+      id: confide.id,
+      userId: confide.confide_user_id,
+      displayName: confide.alias || confide.profiles.email,
+    });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confideToDelete) return;
 
     setLoading(true);
     try {
       // Delete both directions of the confide relationship using database function
       const { error } = await supabase.rpc("delete_confide", {
-        confide_user_id_param: confideUserId,
+        confide_user_id_param: confideToDelete.userId,
       });
 
       if (error) throw error;
 
       toast.success("Confide removed successfully for both users");
+      setDeleteDialogOpen(false);
+      setConfideToDelete(null);
       loadConfides();
     } catch (error) {
       toast.error("Failed to remove confide");
@@ -209,9 +232,7 @@ export default function Confides() {
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() =>
-                              handleDelete(confide.id, confide.confide_user_id)
-                            }
+                            onClick={() => handleDeleteClick(confide)}
                             disabled={loading}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -226,6 +247,28 @@ export default function Confides() {
           </CardContent>
         </Card>
       </div>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Confide?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove <strong>{confideToDelete?.displayName}</strong> from your confide list? 
+              This will remove the confide relationship for both users and cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={loading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {loading ? "Removing..." : "Remove"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Layout>
   );
 }
