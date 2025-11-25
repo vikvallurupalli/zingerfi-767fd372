@@ -89,22 +89,14 @@ export default function Confides() {
 
     setLoading(true);
     try {
-      // Delete both directions of the confide relationship
-      const { error } = await supabase
-        .from("confides")
-        .delete()
-        .eq("id", confideId);
+      // Delete both directions of the confide relationship using database function
+      const { error } = await supabase.rpc("delete_confide", {
+        confide_user_id_param: confideUserId,
+      });
 
       if (error) throw error;
 
-      // Also delete the reverse relationship
-      await supabase
-        .from("confides")
-        .delete()
-        .eq("user_id", confideUserId)
-        .eq("confide_user_id", user?.id);
-
-      toast.success("Confide removed successfully");
+      toast.success("Confide removed successfully for both users");
       loadConfides();
     } catch (error) {
       toast.error("Failed to remove confide");

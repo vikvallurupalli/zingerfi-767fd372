@@ -128,6 +128,10 @@ export type Database = {
         Args: { request_id: string }
         Returns: undefined
       }
+      delete_confide: {
+        Args: { confide_user_id_param: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
