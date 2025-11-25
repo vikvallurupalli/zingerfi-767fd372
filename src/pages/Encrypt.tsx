@@ -145,7 +145,7 @@ export default function Encrypt() {
             <CardTitle>Select Confide</CardTitle>
             <CardDescription>Choose who can decrypt this message</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Select value={selectedConfide} onValueChange={setSelectedConfide}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a confide" />
@@ -163,6 +163,18 @@ export default function Encrypt() {
                 No confides yet. Send a request to add someone.
               </p>
             )}
+            <div className="space-y-2 pt-2 border-t">
+              <p className="text-sm text-muted-foreground">
+                Note: Confidees must have registered by logging in with their Google account.
+              </p>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => window.location.href = '/send-request'}
+              >
+                Add Confidee
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
