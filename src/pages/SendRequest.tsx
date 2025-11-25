@@ -43,7 +43,7 @@ export default function SendRequest() {
       }
 
       if (!receiverProfile) {
-        toast.error("User not found with this email address");
+        toast.error("User not found. User should have registered by logging in at least once");
         return;
       }
 
