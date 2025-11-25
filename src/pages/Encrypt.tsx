@@ -166,64 +166,58 @@ export default function Encrypt() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Message</CardTitle>
-            <CardDescription>Enter the message you want to encrypt</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Textarea
-              placeholder="Enter your message here..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              rows={6}
-              className="resize-none"
-            />
-            <div className="flex gap-2">
-              <Button
-                onClick={handleEncrypt}
-                disabled={loading || !selectedConfide || !message}
-                className="gap-2"
-              >
-                <Lock className="h-4 w-4" />
-                Encrypt
-              </Button>
-              <Button variant="outline" onClick={handleClear} className="gap-2">
-                <Trash2 className="h-4 w-4" />
-                Clear
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {encryptedText && (
-          <Card className="border-primary/50">
+        <div className="flex gap-6">
+          <Card className="flex-1">
             <CardHeader>
-              <CardTitle>Message Encrypted Successfully</CardTitle>
-              <CardDescription>Use the following buttons to send your encrypted message to your confidee</CardDescription>
+              <CardTitle>Message</CardTitle>
+              <CardDescription>Enter the message you want to encrypt</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-3 gap-3">
-                <Button onClick={handleSMS} variant="outline" className="gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  SMS
+            <CardContent className="space-y-4">
+              <Textarea
+                placeholder="Enter your message here..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                rows={6}
+                className="resize-none"
+              />
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleEncrypt}
+                  disabled={loading || !selectedConfide || !message}
+                  className="gap-2"
+                >
+                  <Lock className="h-4 w-4" />
+                  Encrypt
                 </Button>
-                <Button onClick={handleWhatsApp} variant="outline" className="gap-2">
-                  <Send className="h-4 w-4" />
-                  WhatsApp
-                </Button>
-                <Button onClick={handleTelegram} variant="outline" className="gap-2">
-                  <Send className="h-4 w-4" />
-                  Telegram
+                <Button variant="outline" onClick={handleClear} className="gap-2">
+                  <Trash2 className="h-4 w-4" />
+                  Clear
                 </Button>
               </div>
-              <Button onClick={handleCopy} variant="secondary" className="w-full gap-2">
-                <Copy className="h-4 w-4" />
-                Copy to Send Other Ways
-              </Button>
             </CardContent>
           </Card>
-        )}
+
+          {encryptedText && (
+            <div className="flex flex-col gap-3 w-64">
+              <Button onClick={handleSMS} variant="outline" className="gap-2 h-auto py-4">
+                <MessageSquare className="h-5 w-5" />
+                SMS
+              </Button>
+              <Button onClick={handleWhatsApp} variant="outline" className="gap-2 h-auto py-4">
+                <Send className="h-5 w-5" />
+                WhatsApp
+              </Button>
+              <Button onClick={handleTelegram} variant="outline" className="gap-2 h-auto py-4">
+                <Send className="h-5 w-5" />
+                Telegram
+              </Button>
+              <Button onClick={handleCopy} variant="secondary" className="gap-2 h-auto py-4">
+                <Copy className="h-5 w-5" />
+                Copy to Send Other Ways
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </Layout>
   );
