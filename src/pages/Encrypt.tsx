@@ -142,16 +142,14 @@ export default function Encrypt() {
 
         <Card>
           <CardHeader>
-            <div className="flex items-center gap-3">
-              <Button 
-                size="sm"
-                className="h-8 text-sm px-4"
-                onClick={() => window.location.href = '/send-request'}
-              >
-                Add Confidee
-              </Button>
-              <CardTitle>Select Confide</CardTitle>
-            </div>
+            <Button 
+              size="sm"
+              className="h-8 text-sm px-4 w-fit"
+              onClick={() => window.location.href = '/send-request'}
+            >
+              Add Confidee
+            </Button>
+            <CardTitle className="mt-4">Select Confide</CardTitle>
             <CardDescription>Choose who can decrypt this message</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
