@@ -104,6 +104,10 @@ All colors MUST be HSL.
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  .text-muted-foreground {
+    @apply font-semibold;
+  }
+
   .font-mono-encrypted {
     font-family: 'Courier New', monospace;
     letter-spacing: 0.02em;
