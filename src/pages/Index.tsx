@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Lock, Users, Smartphone, Share2, UserPlus, Mail, Key, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import iphoneImage from "@/assets/iphone-encrypted-message.png";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -80,14 +81,25 @@ export default function Index() {
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 pt-20 pb-8 text-center">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <h2 className="text-5xl font-bold tracking-tight">
-            Secure End-to-End Encryption
-          </h2>
-          <p className="text-xl text-muted-foreground">
-            Share encrypted messages with confidence. Your privacy, your control.
-          </p>
+      <section className="container mx-auto px-4 pt-20 pb-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="flex justify-center lg:justify-start">
+              <img 
+                src={iphoneImage} 
+                alt="iPhone showing encrypted message" 
+                className="w-64 h-auto object-contain"
+              />
+            </div>
+            <div className="space-y-6 text-center lg:text-left">
+              <h2 className="text-5xl font-bold tracking-tight">
+                Secure End-to-End Encryption
+              </h2>
+              <p className="text-xl text-muted-foreground">
+                Share encrypted messages with confidence. Your privacy, your control.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
