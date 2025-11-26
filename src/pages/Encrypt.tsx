@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Lock, Copy, Trash2, MessageSquare, Send } from "lucide-react";
+import { Lock, Copy, Trash2, MessageSquare, Send, Mail } from "lucide-react";
 import { toast } from "sonner";
 import {
   encryptMessage,
@@ -125,6 +125,11 @@ export default function Encrypt() {
     window.location.href = `https://t.me/share/url?url=${encodeURIComponent(link)}`;
   };
 
+  const handleEmail = () => {
+    const link = createShareLink();
+    window.location.href = `mailto:?subject=Encrypted Message&body=${encodeURIComponent(link)}`;
+  };
+
   return (
     <Layout>
       <div className="max-w-[42rem] mx-auto space-y-6">
@@ -222,6 +227,10 @@ export default function Encrypt() {
               <Button onClick={handleTelegram} variant="outline" size="sm" className="gap-1 text-xs">
                 <Send className="h-3 w-3" />
                 Telegram
+              </Button>
+              <Button onClick={handleEmail} variant="outline" size="sm" className="gap-1 text-xs">
+                <Mail className="h-3 w-3" />
+                Email
               </Button>
               <Button onClick={handleCopy} variant="secondary" size="sm" className="gap-1 text-xs">
                 <Copy className="h-3 w-3" />
