@@ -210,21 +210,21 @@ export default function Encrypt() {
           </Card>
 
           {encryptedText && (
-            <div className="flex flex-col gap-3 w-64">
-              <Button onClick={handleSMS} variant="outline" className="gap-2 h-auto py-2">
-                <MessageSquare className="h-4 w-4" />
+            <div className="flex flex-col gap-2 w-32">
+              <Button onClick={handleSMS} variant="outline" size="sm" className="gap-1 text-xs">
+                <MessageSquare className="h-3 w-3" />
                 SMS
               </Button>
-              <Button onClick={handleWhatsApp} variant="outline" className="gap-2 h-auto py-2">
-                <Send className="h-4 w-4" />
+              <Button onClick={handleWhatsApp} variant="outline" size="sm" className="gap-1 text-xs">
+                <Send className="h-3 w-3" />
                 WhatsApp
               </Button>
-              <Button onClick={handleTelegram} variant="outline" className="gap-2 h-auto py-2">
-                <Send className="h-4 w-4" />
+              <Button onClick={handleTelegram} variant="outline" size="sm" className="gap-1 text-xs">
+                <Send className="h-3 w-3" />
                 Telegram
               </Button>
-              <Button onClick={handleCopy} variant="secondary" className="gap-2 h-auto py-2">
-                <Copy className="h-4 w-4" />
+              <Button onClick={handleCopy} variant="secondary" size="sm" className="gap-1 text-xs">
+                <Copy className="h-3 w-3" />
                 Copy
               </Button>
             </div>
