@@ -216,19 +216,19 @@ export default function Encrypt() {
 
           {encryptedText && (
             <div className="flex flex-col gap-2 w-32">
-              <Button onClick={handleSMS} variant="outline" size="sm" className="gap-1 text-xs">
+              <Button onClick={handleSMS} variant="sms" size="sm" className="gap-1 text-xs">
                 <MessageSquare className="h-3 w-3" />
                 SMS
               </Button>
-              <Button onClick={handleWhatsApp} variant="outline" size="sm" className="gap-1 text-xs">
+              <Button onClick={handleWhatsApp} variant="whatsapp" size="sm" className="gap-1 text-xs">
                 <Send className="h-3 w-3" />
                 WhatsApp
               </Button>
-              <Button onClick={handleTelegram} variant="outline" size="sm" className="gap-1 text-xs">
+              <Button onClick={handleTelegram} variant="telegram" size="sm" className="gap-1 text-xs">
                 <Send className="h-3 w-3" />
                 Telegram
               </Button>
-              <Button onClick={handleEmail} variant="outline" size="sm" className="gap-1 text-xs">
+              <Button onClick={handleEmail} variant="email" size="sm" className="gap-1 text-xs">
                 <Mail className="h-3 w-3" />
                 Email
               </Button>

@@ -51,6 +51,22 @@ export default {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
         },
+        whatsapp: {
+          DEFAULT: "hsl(var(--whatsapp))",
+          foreground: "hsl(var(--whatsapp-foreground))",
+        },
+        telegram: {
+          DEFAULT: "hsl(var(--telegram))",
+          foreground: "hsl(var(--telegram-foreground))",
+        },
+        sms: {
+          DEFAULT: "hsl(var(--sms))",
+          foreground: "hsl(var(--sms-foreground))",
+        },
+        email: {
+          DEFAULT: "hsl(var(--email))",
+          foreground: "hsl(var(--email-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
