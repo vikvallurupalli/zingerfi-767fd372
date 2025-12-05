@@ -132,11 +132,9 @@ export default function Decrypt() {
   return (
     <Layout>
       <div className="max-w-[70rem] mx-auto space-y-6">
-        <div className="text-center space-y-2">
-          <div className="flex justify-center mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
-              <Unlock className="h-6 w-6 text-accent" />
-            </div>
+        <div className="text-center space-y-2 flex flex-col items-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
+            <Unlock className="h-6 w-6 text-accent" />
           </div>
           <h1 className="text-3xl font-bold">Decrypt Message</h1>
           <p className="text-muted-foreground">
@@ -173,11 +171,11 @@ export default function Decrypt() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="scale-[0.6] origin-top-left md:origin-top w-[166.67%] md:w-[166.67%]">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-items-center">
+          <Card className="scale-[0.6] origin-top w-[166.67%]">
             <CardHeader>
-              <CardTitle>Encrypted Message</CardTitle>
-              <CardDescription>Paste the encrypted text here</CardDescription>
+              <CardTitle className="text-xl">Encrypted Message</CardTitle>
+              <CardDescription className="text-base">Paste the encrypted text here</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
@@ -185,7 +183,7 @@ export default function Decrypt() {
                 value={encryptedText}
                 onChange={(e) => setEncryptedText(e.target.value)}
                 rows={8}
-                className="resize-none font-mono-encrypted text-xs break-all"
+                className="resize-none font-mono-encrypted text-base break-all text-foreground"
               />
               <div className="flex gap-2">
                 <Button
@@ -204,10 +202,10 @@ export default function Decrypt() {
             </CardContent>
           </Card>
 
-          <Card className={`scale-[0.6] origin-top-right md:origin-top w-[166.67%] md:w-[166.67%] ml-auto md:ml-0 border-success/50 ${!decryptedMessage ? 'opacity-50' : ''}`}>
+          <Card className={`scale-[0.6] origin-top w-[166.67%] border-success/50 ${!decryptedMessage ? 'opacity-50' : ''}`}>
             <CardHeader>
-              <CardTitle>Decrypted Message</CardTitle>
-              <CardDescription>Your decrypted message is ready</CardDescription>
+              <CardTitle className="text-xl">Decrypted Message</CardTitle>
+              <CardDescription className="text-base">Your decrypted message is ready</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="relative">
@@ -216,7 +214,7 @@ export default function Decrypt() {
                   readOnly
                   rows={8}
                   placeholder="Decrypted message will appear here..."
-                  className="resize-none"
+                  className="resize-none text-base text-foreground"
                 />
               </div>
               <Button onClick={handleCopy} disabled={!decryptedMessage} className="w-full gap-2">
