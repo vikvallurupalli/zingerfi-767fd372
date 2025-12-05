@@ -189,13 +189,13 @@ export default function Decrypt() {
                 <Button
                   onClick={handleDecrypt}
                   disabled={loading || !encryptedText || !senderEmail}
-                  className="gap-2"
+                  className="gap-2 h-12 px-6 text-lg"
                 >
-                  <Unlock className="h-4 w-4" />
+                  <Unlock className="h-5 w-5" />
                   Decrypt
                 </Button>
-                <Button variant="outline" onClick={handleClear} className="gap-2">
-                  <Trash2 className="h-4 w-4" />
+                <Button variant="outline" onClick={handleClear} className="gap-2 h-12 px-6 text-lg">
+                  <Trash2 className="h-5 w-5" />
                   Clear
                 </Button>
               </div>
@@ -214,11 +214,11 @@ export default function Decrypt() {
                   readOnly
                   rows={8}
                   placeholder="Decrypted message will appear here..."
-                  className="resize-none text-base text-foreground"
+                  className="resize-none text-lg font-medium text-foreground"
                 />
               </div>
-              <Button onClick={handleCopy} disabled={!decryptedMessage} className="w-full gap-2">
-                <Copy className="h-4 w-4" />
+              <Button onClick={handleCopy} disabled={!decryptedMessage} className="w-full gap-2 h-12 text-lg">
+                <Copy className="h-5 w-5" />
                 Copy to Clipboard
               </Button>
             </CardContent>
