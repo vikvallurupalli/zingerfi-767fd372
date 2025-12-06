@@ -50,17 +50,6 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">
-      {/* Secret Caption Banner */}
-      <div className="bg-primary/10 border-b border-primary/20">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary animate-pulse" />
-          <span className="text-lg md:text-xl font-bold text-primary tracking-wide italic">
-            Sshhhhh its a secret
-          </span>
-          <Sparkles className="h-5 w-5 text-primary animate-pulse" />
-        </div>
-      </div>
-
       {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -94,6 +83,15 @@ export default function Index() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-6xl mx-auto">
+          {/* Secret Caption */}
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+            <span className="text-2xl md:text-3xl font-bold text-primary tracking-wide italic">
+              Sshhhhh its a secret
+            </span>
+            <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+          </div>
+
           {/* Main Hero Content */}
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
