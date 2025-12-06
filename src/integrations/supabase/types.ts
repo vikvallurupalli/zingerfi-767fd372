@@ -101,6 +101,7 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          current_session_id: string | null
           email: string
           encrypted_private_key: string
           id: string
@@ -108,6 +109,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          current_session_id?: string | null
           email: string
           encrypted_private_key: string
           id: string
@@ -115,6 +117,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          current_session_id?: string | null
           email?: string
           encrypted_private_key?: string
           id?: string
