@@ -122,8 +122,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const storedSessionId = localStorage.getItem(`session_id_${session.user.id}`);
         
         if (storedSessionId) {
-          // We have a local session ID - use it and validate
+          // We have a local session ID - validate it against DB immediately
           sessionIdRef.current = storedSessionId;
+          
+          const isValid = await validateSession(session.user.id, storedSessionId);
+          if (!isValid) {
+            // Session is invalid - another device has logged in
+            localStorage.removeItem(`session_id_${session.user.id}`);
+            sessionIdRef.current = null;
+            toast({
+              title: "Session Expired",
+              description: "You have been logged out because you logged in from another device or browser.",
+              variant: "destructive",
+              duration: 10000,
+            });
+            await supabase.auth.signOut();
+            setUser(null);
+            setSession(null);
+            setLoading(false);
+            isInitialLoad = false;
+            return;
+          }
         } else {
           // No local session ID - check if DB has one (another device logged in)
           const { data: profile } = await supabase
@@ -141,6 +160,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               duration: 10000,
             });
             await supabase.auth.signOut();
+            setUser(null);
+            setSession(null);
             setLoading(false);
             isInitialLoad = false;
             return;
