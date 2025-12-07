@@ -51,14 +51,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    let isInitialLoad = true;
+    
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
 
-        if (event === "SIGNED_IN" && session?.user) {
-          // Generate new session ID and store it
+        // Only generate new session ID for actual new sign-ins, not page refreshes
+        if (event === "SIGNED_IN" && session?.user && !isInitialLoad) {
+          // This is a fresh login, not a page refresh
           const newSessionId = generateSessionId();
           sessionIdRef.current = newSessionId;
           localStorage.setItem(`session_id_${session.user.id}`, newSessionId);
@@ -82,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               // Store private key in IndexedDB
               await storePrivateKey(session.user.id, privateKey);
 
-              // Store public key in database (encrypted private key stored as encrypted in DB)
+              // Store public key in database
               await supabase
                 .from("profiles")
                 .update({
@@ -115,14 +118,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        // Retrieve stored session ID
-        const storedSessionId = localStorage.getItem(`session_id_${session.user.id}`);
-        if (storedSessionId) {
-          sessionIdRef.current = storedSessionId;
+        // Retrieve stored session ID or generate new one if first time
+        let storedSessionId = localStorage.getItem(`session_id_${session.user.id}`);
+        
+        if (!storedSessionId) {
+          // First time on this browser - generate and sync session ID
+          storedSessionId = generateSessionId();
+          localStorage.setItem(`session_id_${session.user.id}`, storedSessionId);
+          updateSessionInDb(session.user.id, storedSessionId);
         }
+        
+        sessionIdRef.current = storedSessionId;
       }
       
       setLoading(false);
+      isInitialLoad = false;
     });
 
     return () => subscription.unsubscribe();
