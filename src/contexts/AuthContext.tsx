@@ -113,22 +113,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        // Retrieve stored session ID or generate new one if first time
-        let storedSessionId = localStorage.getItem(`session_id_${session.user.id}`);
+        // Retrieve stored session ID
+        const storedSessionId = localStorage.getItem(`session_id_${session.user.id}`);
         
-        if (!storedSessionId) {
-          // First time on this browser - generate and sync session ID
-          storedSessionId = generateSessionId();
-          localStorage.setItem(`session_id_${session.user.id}`, storedSessionId);
-          updateSessionInDb(session.user.id, storedSessionId);
+        if (storedSessionId) {
+          // We have a local session ID - use it and validate
+          sessionIdRef.current = storedSessionId;
+        } else {
+          // No local session ID - check if DB has one (another device logged in)
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("current_session_id")
+            .eq("id", session.user.id)
+            .single();
+          
+          if (profile?.current_session_id) {
+            // DB has a session ID from another device - this session is invalid
+            toast({
+              title: "Session Invalid",
+              description: "You are logged in from another device or browser.",
+              variant: "destructive",
+              duration: 10000,
+            });
+            await supabase.auth.signOut();
+            setLoading(false);
+            isInitialLoad = false;
+            return;
+          } else {
+            // No session ID in DB - first time setup, generate one
+            const newSessionId = generateSessionId();
+            localStorage.setItem(`session_id_${session.user.id}`, newSessionId);
+            await updateSessionInDb(session.user.id, newSessionId);
+            sessionIdRef.current = newSessionId;
+          }
         }
-        
-        sessionIdRef.current = storedSessionId;
       }
       
       setLoading(false);
