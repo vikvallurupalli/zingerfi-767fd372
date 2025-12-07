@@ -185,13 +185,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user, navigate]);
 
   const signOut = async () => {
-    // Clear local session ID before signing out
-    if (user) {
-      localStorage.removeItem(`session_id_${user.id}`);
-      sessionIdRef.current = null;
+    try {
+      // Clear local session ID before signing out
+      if (user) {
+        localStorage.removeItem(`session_id_${user.id}`);
+        sessionIdRef.current = null;
+      }
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Sign out error:", error);
+        toast({
+          title: "Error signing out",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        // Force clear state
+        setUser(null);
+        setSession(null);
+        navigate("/");
+      }
+    } catch (err) {
+      console.error("Sign out exception:", err);
+      // Force clear state even on error
+      setUser(null);
+      setSession(null);
+      navigate("/");
     }
-    await supabase.auth.signOut();
-    navigate("/");
   };
 
   return (
