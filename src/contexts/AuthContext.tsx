@@ -185,6 +185,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user, navigate]);
 
   const signOut = async () => {
+    // Clear local session ID before signing out
+    if (user) {
+      localStorage.removeItem(`session_id_${user.id}`);
+      sessionIdRef.current = null;
+    }
     await supabase.auth.signOut();
     navigate("/");
   };
