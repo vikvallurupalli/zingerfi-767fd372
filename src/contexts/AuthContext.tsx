@@ -211,7 +211,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (user) {
         localStorage.removeItem(`session_id_${user.id}`);
         sessionIdRef.current = null;
+        
+        // Clear session ID in database to properly invalidate this session
+        await supabase
+          .from("profiles")
+          .update({ current_session_id: null })
+          .eq("id", user.id);
       }
+      
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("Sign out error:", error);
@@ -220,12 +227,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           description: error.message,
           variant: "destructive",
         });
-      } else {
-        // Force clear state
-        setUser(null);
-        setSession(null);
-        navigate("/");
       }
+      
+      // Force clear state regardless of signOut result
+      setUser(null);
+      setSession(null);
+      navigate("/");
     } catch (err) {
       console.error("Sign out exception:", err);
       // Force clear state even on error
