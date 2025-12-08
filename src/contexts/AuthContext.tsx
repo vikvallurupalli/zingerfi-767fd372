@@ -144,7 +144,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             return;
           }
         } else {
-          // No local session ID - check if DB has one (another device logged in)
+          // No local session ID - this browser was never logged in or was logged out
+          // If DB has an active session, this browser shouldn't have access
           const { data: profile } = await supabase
             .from("profiles")
             .select("current_session_id")
@@ -152,10 +153,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .single();
           
           if (profile?.current_session_id) {
-            // DB has a session ID from another device - this session is invalid
+            // Another device has an active session - force logout this stale session
             toast({
               title: "Session Invalid",
-              description: "You are logged in from another device or browser.",
+              description: "This session is no longer valid. Please log in again.",
               variant: "destructive",
               duration: 10000,
             });
@@ -165,13 +166,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setLoading(false);
             isInitialLoad = false;
             return;
-          } else {
-            // No session ID in DB - first time setup, generate one
-            const newSessionId = generateSessionId();
-            localStorage.setItem(`session_id_${session.user.id}`, newSessionId);
-            await updateSessionInDb(session.user.id, newSessionId);
-            sessionIdRef.current = newSessionId;
           }
+          // No session in DB means user logged out everywhere - force logout
+          await supabase.auth.signOut();
+          setUser(null);
+          setSession(null);
+          setLoading(false);
+          isInitialLoad = false;
+          return;
         }
       }
       
@@ -207,35 +209,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // Clear local session ID before signing out
-      if (user) {
-        localStorage.removeItem(`session_id_${user.id}`);
+      const userId = user?.id;
+      const localSessionId = userId ? localStorage.getItem(`session_id_${userId}`) : null;
+      
+      // Clear local session ID
+      if (userId) {
+        localStorage.removeItem(`session_id_${userId}`);
         sessionIdRef.current = null;
         
-        // Clear session ID in database to properly invalidate this session
-        await supabase
-          .from("profiles")
-          .update({ current_session_id: null })
-          .eq("id", user.id);
+        // Only clear DB session if this browser owns it
+        if (localSessionId) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("current_session_id")
+            .eq("id", userId)
+            .single();
+          
+          // Only clear if we own the session (prevents clearing newer session from another device)
+          if (profile?.current_session_id === localSessionId) {
+            await supabase
+              .from("profiles")
+              .update({ current_session_id: null })
+              .eq("id", userId);
+          }
+        }
       }
       
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("Sign out error:", error);
-        toast({
-          title: "Error signing out",
-          description: error.message,
-          variant: "destructive",
-        });
       }
       
-      // Force clear state regardless of signOut result
+      // Force clear state
       setUser(null);
       setSession(null);
       navigate("/");
     } catch (err) {
       console.error("Sign out exception:", err);
-      // Force clear state even on error
       setUser(null);
       setSession(null);
       navigate("/");
