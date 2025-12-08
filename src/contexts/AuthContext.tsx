@@ -51,17 +51,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    let isInitialLoad = true;
+    let hasInitialSession = false;
     
-    // Set up auth state listener
+    // First check for existing session to know if this is a fresh login or page refresh
+    supabase.auth.getSession().then(async ({ data: { session: existingSession } }) => {
+      hasInitialSession = !!existingSession;
+      
+      if (existingSession?.user) {
+        setSession(existingSession);
+        setUser(existingSession.user ?? null);
+        
+        // Retrieve stored session ID
+        const storedSessionId = localStorage.getItem(`session_id_${existingSession.user.id}`);
+        
+        if (storedSessionId) {
+          // We have a local session ID - validate it against DB
+          sessionIdRef.current = storedSessionId;
+          
+          const isValid = await validateSession(existingSession.user.id, storedSessionId);
+          if (!isValid) {
+            // Session is invalid - another device has logged in
+            localStorage.removeItem(`session_id_${existingSession.user.id}`);
+            sessionIdRef.current = null;
+            toast({
+              title: "Session Expired",
+              description: "You have been logged out because you logged in from another device or browser.",
+              variant: "destructive",
+              duration: 10000,
+            });
+            await supabase.auth.signOut();
+            setUser(null);
+            setSession(null);
+          }
+        } else {
+          // No local session ID but we have a Supabase session
+          // Check if DB has an active session from another device
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("current_session_id")
+            .eq("id", existingSession.user.id)
+            .single();
+          
+          if (profile?.current_session_id) {
+            // Another device has an active session - force logout this stale session
+            toast({
+              title: "Session Invalid",
+              description: "This session is no longer valid. Please log in again.",
+              variant: "destructive",
+              duration: 10000,
+            });
+            await supabase.auth.signOut();
+            setUser(null);
+            setSession(null);
+          } else {
+            // No session in DB - this is a stale Supabase session, logout
+            await supabase.auth.signOut();
+            setUser(null);
+            setSession(null);
+          }
+        }
+      }
+      
+      setLoading(false);
+    });
+
+    // Set up auth state listener for future changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        // Only generate new session ID for actual new sign-ins, not page refreshes
-        if (event === "SIGNED_IN" && session?.user && !isInitialLoad) {
-          // This is a fresh login, not a page refresh
+        // Handle fresh sign-ins (not page refreshes)
+        if (event === "SIGNED_IN" && session?.user && !hasInitialSession) {
+          setSession(session);
+          setUser(session.user ?? null);
+          
+          // This is a fresh login - generate new session ID
           const newSessionId = generateSessionId();
           sessionIdRef.current = newSessionId;
           localStorage.setItem(`session_id_${session.user.id}`, newSessionId);
@@ -106,80 +168,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               }
             }
           }, 0);
+          
+          setLoading(false);
+        } else if (event === "SIGNED_OUT") {
+          setSession(null);
+          setUser(null);
+          setLoading(false);
         }
-
-        setLoading(false);
       }
     );
-
-    // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        // Retrieve stored session ID
-        const storedSessionId = localStorage.getItem(`session_id_${session.user.id}`);
-        
-        if (storedSessionId) {
-          // We have a local session ID - validate it against DB immediately
-          sessionIdRef.current = storedSessionId;
-          
-          const isValid = await validateSession(session.user.id, storedSessionId);
-          if (!isValid) {
-            // Session is invalid - another device has logged in
-            localStorage.removeItem(`session_id_${session.user.id}`);
-            sessionIdRef.current = null;
-            toast({
-              title: "Session Expired",
-              description: "You have been logged out because you logged in from another device or browser.",
-              variant: "destructive",
-              duration: 10000,
-            });
-            await supabase.auth.signOut();
-            setUser(null);
-            setSession(null);
-            setLoading(false);
-            isInitialLoad = false;
-            return;
-          }
-        } else {
-          // No local session ID - this browser was never logged in or was logged out
-          // If DB has an active session, this browser shouldn't have access
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("current_session_id")
-            .eq("id", session.user.id)
-            .single();
-          
-          if (profile?.current_session_id) {
-            // Another device has an active session - force logout this stale session
-            toast({
-              title: "Session Invalid",
-              description: "This session is no longer valid. Please log in again.",
-              variant: "destructive",
-              duration: 10000,
-            });
-            await supabase.auth.signOut();
-            setUser(null);
-            setSession(null);
-            setLoading(false);
-            isInitialLoad = false;
-            return;
-          }
-          // No session in DB means user logged out everywhere - force logout
-          await supabase.auth.signOut();
-          setUser(null);
-          setSession(null);
-          setLoading(false);
-          isInitialLoad = false;
-          return;
-        }
-      }
-      
-      setLoading(false);
-      isInitialLoad = false;
-    });
 
     return () => subscription.unsubscribe();
   }, []);
