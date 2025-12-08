@@ -51,11 +51,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    let hasInitialSession = false;
+    let isInitialized = false;
+    let isFreshLogin = false;
     
-    // First check for existing session to know if this is a fresh login or page refresh
-    supabase.auth.getSession().then(async ({ data: { session: existingSession } }) => {
-      hasInitialSession = !!existingSession;
+    const initializeAuth = async () => {
+      const { data: { session: existingSession } } = await supabase.auth.getSession();
       
       if (existingSession?.user) {
         setSession(existingSession);
@@ -112,18 +112,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
       
+      isInitialized = true;
       setLoading(false);
-    });
+    };
 
-    // Set up auth state listener for future changes
+    // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // Handle fresh sign-ins (not page refreshes)
-        if (event === "SIGNED_IN" && session?.user && !hasInitialSession) {
+        // Skip if we haven't initialized yet (will be handled by initializeAuth)
+        if (!isInitialized && event !== "SIGNED_IN") return;
+        
+        // Handle fresh sign-ins
+        if (event === "SIGNED_IN" && session?.user) {
+          // Check if this user already has a local session ID (page refresh vs fresh login)
+          const existingLocalSessionId = localStorage.getItem(`session_id_${session.user.id}`);
+          
+          if (existingLocalSessionId && !isFreshLogin) {
+            // This is likely a page refresh or token refresh, not a fresh login
+            // The session was already handled by initializeAuth
+            return;
+          }
+          
+          // This is a fresh login
+          isFreshLogin = true;
           setSession(session);
           setUser(session.user ?? null);
           
-          // This is a fresh login - generate new session ID
+          // Generate new session ID
           const newSessionId = generateSessionId();
           sessionIdRef.current = newSessionId;
           localStorage.setItem(`session_id_${session.user.id}`, newSessionId);
@@ -171,12 +186,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           
           setLoading(false);
         } else if (event === "SIGNED_OUT") {
+          isFreshLogin = false;
           setSession(null);
           setUser(null);
           setLoading(false);
         }
       }
     );
+
+    initializeAuth();
 
     return () => subscription.unsubscribe();
   }, []);
