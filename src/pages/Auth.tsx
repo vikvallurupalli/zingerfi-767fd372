@@ -21,6 +21,9 @@ export default function Auth() {
   
   const handleGoogleLogin = async () => {
     try {
+      // Set flag to indicate OAuth is in progress
+      sessionStorage.setItem('oauth_in_progress', 'true');
+      
       const redirectUrl = `${window.location.origin}/dashboard`
       
       const { error } = await supabase.auth.signInWithOAuth({
@@ -31,11 +34,13 @@ export default function Auth() {
       });
 
       if (error) {
+        sessionStorage.removeItem('oauth_in_progress');
         toast.error("Authentication failed", {
           description: error.message,
         });
       }
     } catch (error) {
+      sessionStorage.removeItem('oauth_in_progress');
       toast.error("An unexpected error occurred");
     }
   };
