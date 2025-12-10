@@ -54,10 +54,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let isInitialized = false;
     let isFreshLogin = false;
     
+    // Check if this is an OAuth callback (fresh login)
+    const isOAuthCallback = window.location.hash.includes('access_token') || 
+                            window.location.search.includes('code=') ||
+                            sessionStorage.getItem('oauth_in_progress') === 'true';
+    
     const initializeAuth = async () => {
       const { data: { session: existingSession } } = await supabase.auth.getSession();
       
       if (existingSession?.user) {
+        // If this is a fresh OAuth callback, treat it as a new login
+        if (isOAuthCallback) {
+          sessionStorage.removeItem('oauth_in_progress');
+          isFreshLogin = true;
+          setSession(existingSession);
+          setUser(existingSession.user ?? null);
+          
+          // Generate new session ID for this fresh login
+          const newSessionId = generateSessionId();
+          sessionIdRef.current = newSessionId;
+          localStorage.setItem(`session_id_${existingSession.user.id}`, newSessionId);
+          
+          // Update session ID in database (invalidates other sessions)
+          await updateSessionInDb(existingSession.user.id, newSessionId);
+          
+          // Handle key generation/retrieval
+          setTimeout(async () => {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("public_key, encrypted_private_key")
+              .eq("id", existingSession.user.id)
+              .single();
+
+            if (profile && !profile.public_key) {
+              // Generate keys for new user
+              const keyPair = await generateKeyPair();
+              const publicKey = await exportPublicKey(keyPair.publicKey);
+              const privateKey = await exportPrivateKey(keyPair.privateKey);
+
+              // Store private key in IndexedDB
+              await storePrivateKey(existingSession.user.id, privateKey);
+
+              // Store public key in database
+              await supabase
+                .from("profiles")
+                .update({
+                  public_key: publicKey,
+                  encrypted_private_key: privateKey,
+                })
+                .eq("id", existingSession.user.id);
+            } else if (profile?.encrypted_private_key) {
+              await storePrivateKey(existingSession.user.id, profile.encrypted_private_key);
+            }
+          }, 0);
+          
+          isInitialized = true;
+          setLoading(false);
+          return;
+        }
+        
         setSession(existingSession);
         setUser(existingSession.user ?? null);
         
@@ -85,30 +140,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         } else {
           // No local session ID but we have a Supabase session
-          // Check if DB has an active session from another device
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("current_session_id")
-            .eq("id", existingSession.user.id)
-            .single();
-          
-          if (profile?.current_session_id) {
-            // Another device has an active session - force logout this stale session
-            toast({
-              title: "Session Invalid",
-              description: "This session is no longer valid. Please log in again.",
-              variant: "destructive",
-              duration: 10000,
-            });
-            await supabase.auth.signOut();
-            setUser(null);
-            setSession(null);
-          } else {
-            // No session in DB - this is a stale Supabase session, logout
-            await supabase.auth.signOut();
-            setUser(null);
-            setSession(null);
-          }
+          // This is a stale session without local tracking - logout
+          await supabase.auth.signOut();
+          setUser(null);
+          setSession(null);
         }
       }
       
