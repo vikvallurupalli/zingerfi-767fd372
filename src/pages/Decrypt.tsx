@@ -32,6 +32,15 @@ interface Confide {
   };
 }
 
+// Simple hash function for message tracking
+async function hashMessage(message: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 export default function Decrypt() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
@@ -83,6 +92,26 @@ export default function Decrypt() {
 
     setLoading(true);
     try {
+      // Check if message was already decrypted
+      const messageHash = await hashMessage(encryptedText);
+      
+      const { data: existingDecryption, error: checkError } = await supabase
+        .from("decrypted_messages")
+        .select("id")
+        .eq("message_hash", messageHash)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error("Error checking decryption status:", checkError);
+        throw new Error("Failed to verify message status");
+      }
+
+      if (existingDecryption) {
+        toast.error("This message has already been decrypted and cannot be decrypted again");
+        setLoading(false);
+        return;
+      }
+
       // Get sender's public key
       const { data: senderProfile, error: senderError } = await supabase
         .from("profiles")
@@ -107,8 +136,21 @@ export default function Decrypt() {
         senderPublicKey,
         privateKey
       );
-      setDecryptedMessage(decrypted);
 
+      // Record that this message has been decrypted
+      const { error: insertError } = await supabase
+        .from("decrypted_messages")
+        .insert({
+          message_hash: messageHash,
+          decrypted_by: user.id
+        });
+
+      if (insertError) {
+        console.error("Error recording decryption:", insertError);
+        // Still show the decrypted message even if recording fails
+      }
+
+      setDecryptedMessage(decrypted);
       toast.success("Message decrypted successfully");
     } catch (error) {
       console.error("Decryption error:", error);
