@@ -96,8 +96,9 @@ export default function Encrypt() {
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(encryptedText);
-    toast.success("Encrypted text copied to clipboard");
+    const link = createShareLink();
+    navigator.clipboard.writeText(link);
+    toast.success("Encrypted link copied to clipboard");
   };
 
   const handleClear = () => {

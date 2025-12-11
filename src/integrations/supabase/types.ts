@@ -98,6 +98,27 @@ export type Database = {
           },
         ]
       }
+      decrypted_messages: {
+        Row: {
+          decrypted_at: string
+          decrypted_by: string
+          id: string
+          message_hash: string
+        }
+        Insert: {
+          decrypted_at?: string
+          decrypted_by: string
+          id?: string
+          message_hash: string
+        }
+        Update: {
+          decrypted_at?: string
+          decrypted_by?: string
+          id?: string
+          message_hash?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
