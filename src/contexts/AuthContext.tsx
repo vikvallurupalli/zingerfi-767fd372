@@ -42,13 +42,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Validate current session against stored session
   const validateSession = async (userId: string, currentSessionId: string): Promise<boolean> => {
-    const { data: profile } = await supabase
+    const { data: profile, error } = await supabase
       .from("profiles")
       .select("current_session_id")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
-    return profile?.current_session_id === currentSessionId;
+    // If profile doesn't exist yet (first-time user), consider session valid
+    if (error || !profile) {
+      return true;
+    }
+    
+    // If profile exists but has no session ID yet, consider valid (first-time setup)
+    if (!profile.current_session_id) {
+      return true;
+    }
+
+    return profile.current_session_id === currentSessionId;
   };
 
   // Handle fresh login - generate new session and update DB
@@ -60,18 +70,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     sessionIdRef.current = newSessionId;
     localStorage.setItem(`session_id_${userId}`, newSessionId);
     
-    // Update DB - this invalidates all other sessions
-    await updateSessionInDb(userId, newSessionId);
-    
     // Clear OAuth flag
     sessionStorage.removeItem('oauth_in_progress');
     
-    // Handle key generation/retrieval
-    const { data: profile } = await supabase
+    // Wait a moment for the trigger to create the profile if it's a new user
+    let profile = null;
+    let retries = 0;
+    while (retries < 5) {
+      const { data } = await supabase
+        .from("profiles")
+        .select("public_key, encrypted_private_key")
+        .eq("id", userId)
+        .maybeSingle();
+      
+      if (data) {
+        profile = data;
+        break;
+      }
+      
+      // Wait 500ms before retrying
+      await new Promise(resolve => setTimeout(resolve, 500));
+      retries++;
+    }
+    
+    // Update session ID in DB
+    await supabase
       .from("profiles")
-      .select("public_key, encrypted_private_key")
-      .eq("id", userId)
-      .single();
+      .update({ current_session_id: newSessionId })
+      .eq("id", userId);
 
     if (profile && !profile.public_key) {
       // Generate keys for new user
