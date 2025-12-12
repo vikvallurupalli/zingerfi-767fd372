@@ -164,18 +164,28 @@ export default function Encrypt() {
                 <SelectValue placeholder="Select a confide" />
               </SelectTrigger>
               <SelectContent>
-                {confides.map((confide) => (
-                  <SelectItem key={confide.id} value={confide.confide_user_id}>
-                    {confide.alias || confide.profiles.email}
-                  </SelectItem>
-                ))}
+                {confides.length === 0 ? (
+                  <div className="p-4 text-center space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Your confide list is empty
+                    </p>
+                    <Button 
+                      size="sm" 
+                      onClick={() => window.location.href = '/send-request'}
+                      className="gap-2"
+                    >
+                      Add Confide
+                    </Button>
+                  </div>
+                ) : (
+                  confides.map((confide) => (
+                    <SelectItem key={confide.id} value={confide.confide_user_id}>
+                      {confide.alias || confide.profiles.email}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
-            {confides.length === 0 && (
-              <p className="text-sm text-muted-foreground mt-2">
-                No confides yet. Send a request to add someone.
-              </p>
-            )}
             <div className="pt-2 border-t">
               <p className="text-sm text-muted-foreground">
                 Note: Confidees must have registered by logging in with their Google account.
