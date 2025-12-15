@@ -143,7 +143,19 @@ export default function Index() {
             </Card>
 
             {/* Install App Card */}
-            <Card className="bg-gradient-to-br from-success/5 to-success/10 border-success/20 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer md:col-span-2 lg:col-span-1" onClick={() => setShowInstallIOS(true)}>
+              <img 
+                src={iphoneImage} 
+                alt="iPhone showing encrypted message" 
+                className="relative w-full max-w-md h-auto shadow-2xl rounded-3xl"
+              />
+           
+          </div>
+
+          {/* iPhone Mockup */}
+          <div className="flex justify-center">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 blur-3xl rounded-full opacity-50"></div>
+ <Card className="bg-gradient-to-br from-success/5 to-success/10 border-success/20 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer md:col-span-2 lg:col-span-1" onClick={() => setShowInstallIOS(true)}>
               <CardHeader className="text-center">
                 <div className="mx-auto h-16 w-16 rounded-2xl bg-success/20 flex items-center justify-center mb-4">
                   <Smartphone className="h-8 w-8 text-success" />
@@ -160,17 +172,6 @@ export default function Index() {
                 </Button>
               </CardContent>
             </Card>
-          </div>
-
-          {/* iPhone Mockup */}
-          <div className="flex justify-center">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 blur-3xl rounded-full opacity-50"></div>
-              <img 
-                src={iphoneImage} 
-                alt="iPhone showing encrypted message" 
-                className="relative w-full max-w-md h-auto shadow-2xl rounded-3xl"
-              />
             </div>
           </div>
         </div>
