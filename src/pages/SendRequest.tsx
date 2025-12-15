@@ -135,7 +135,7 @@ export default function SendRequest() {
           <CardContent>
             <form onSubmit={handleSendRequest} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email">Email Address (Case sensitive)</Label>
                 <Input
                   id="email"
                   type="email"
