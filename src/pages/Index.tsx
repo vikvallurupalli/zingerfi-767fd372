@@ -58,7 +58,7 @@ export default function Index() {
               <Shield className="h-7 w-7 text-primary-foreground" />
             </div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Zinger
+              ZingerFi
             </h1>
           </div>
           <div className="flex items-center gap-3">
