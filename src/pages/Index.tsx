@@ -110,7 +110,7 @@ export default function Index() {
                 <div className="mx-auto h-16 w-16 rounded-2xl bg-primary/20 flex items-center justify-center mb-4">
                   <Key className="h-8 w-8 text-primary" />
                 </div>
-                <CardTitle className="text-2xl">Encrypt and send via SMS, Whatsapp, Telegram or Email</CardTitle>
+                <CardTitle className="text-2xl">Encrypt and Send</CardTitle>
                 <CardDescription className="text-base">
                   Begin securing your messages now
                 </CardDescription>
@@ -130,11 +130,11 @@ export default function Index() {
                   <Users className="h-8 w-8 text-accent" />
                 </div>
                 <CardTitle className="text-2xl">How to Use</CardTitle>
-                <br></br>
+                
                 <CardDescription className="text-base">
                   Learn the simple 4-step process
                 </CardDescription>
-                <br></br>
+                
               </CardHeader>
               <CardContent>
                 <Button size="lg" variant="outline" className="w-full gap-2 h-12 text-lg">
@@ -150,11 +150,11 @@ export default function Index() {
                   <Smartphone className="h-8 w-8 text-success" />
                 </div>
                 <CardTitle className="text-2xl">Install App</CardTitle>
-                <br></br>
+                
                 <CardDescription className="text-base">
                   iPhone, iPad & Android supported
                 </CardDescription>
-                <br></br>
+                
               </CardHeader>
               <CardContent>
                 <Button size="lg" variant="secondary" className="w-full gap-2 h-12 text-lg">
