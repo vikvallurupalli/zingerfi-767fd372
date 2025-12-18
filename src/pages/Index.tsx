@@ -134,6 +134,7 @@ export default function Index() {
                 <CardDescription className="text-base">
                   Learn the simple 4-step process
                 </CardDescription>
+                <br></br>
               </CardHeader>
               <CardContent>
                 <Button size="lg" variant="outline" className="w-full gap-2 h-12 text-lg">
@@ -153,6 +154,7 @@ export default function Index() {
                 <CardDescription className="text-base">
                   iPhone, iPad & Android supported
                 </CardDescription>
+                <br></br>
               </CardHeader>
               <CardContent>
                 <Button size="lg" variant="secondary" className="w-full gap-2 h-12 text-lg">
