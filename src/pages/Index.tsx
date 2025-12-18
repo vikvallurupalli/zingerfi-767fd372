@@ -130,6 +130,7 @@ export default function Index() {
                   <Users className="h-8 w-8 text-accent" />
                 </div>
                 <CardTitle className="text-2xl">How to Use</CardTitle>
+                <br></br>
                 <CardDescription className="text-base">
                   Learn the simple 4-step process
                 </CardDescription>
@@ -148,6 +149,7 @@ export default function Index() {
                   <Smartphone className="h-8 w-8 text-success" />
                 </div>
                 <CardTitle className="text-2xl">Install App</CardTitle>
+                <br></br>
                 <CardDescription className="text-base">
                   iPhone, iPad & Android supported
                 </CardDescription>
