@@ -68,7 +68,7 @@ export default function Index() {
               </span>
             )}
             <Button onClick={handleGetStarted} size="lg" className="shadow-md hover:shadow-lg transition-shadow">
-              {user ? "Go to Dashboard" : "Get Started"}
+              {user ? "Go to Dashboard" : "Encrypt Message"}
             </Button>
             {user && (
               <Button variant="outline" onClick={signOut} className="gap-2">
@@ -110,7 +110,7 @@ export default function Index() {
                 <div className="mx-auto h-16 w-16 rounded-2xl bg-primary/20 flex items-center justify-center mb-4">
                   <Key className="h-8 w-8 text-primary" />
                 </div>
-                <CardTitle className="text-2xl">Start Encrypting</CardTitle>
+                <CardTitle className="text-2xl">Encrypt and send via SMS, Whatsapp, Telegram or Email</CardTitle>
                 <CardDescription className="text-base">
                   Begin securing your messages now
                 </CardDescription>
@@ -118,7 +118,7 @@ export default function Index() {
               <CardContent>
                 <Button size="lg" onClick={handleGetStarted} className="w-full gap-2 h-12 text-lg shadow-md">
                   <Lock className="h-5 w-5" />
-                  {user ? "Go to Dashboard" : "Get Started"}
+                  {user ? "Go to Dashboard" : "Encrypt Message"}
                 </Button>
               </CardContent>
             </Card>
