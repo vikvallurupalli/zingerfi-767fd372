@@ -75,7 +75,7 @@ export function Layout({ children }: LayoutProps) {
     { path: "/encrypt", icon: Lock, label: "Encrypt" },
     { path: "/decrypt", icon: Unlock, label: "Decrypt" },
     { path: "/confides", icon: Users, label: "Confides" },
-    { path: "/send-request", icon: Send, label: "Request a Confide" },
+    { path: "/send-request", icon: Send, label: "Add Confide" },
     { path: "/pending-requests", icon: Clock, label: "Pending", count: pendingCount },
     { path: "/incoming-requests", icon: Inbox, label: "Incoming", count: incomingCount },
   ];
