@@ -69,7 +69,7 @@ export default function Dashboard() {
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <Send className="h-8 w-8 text-accent mb-2" />
-              <CardTitle>Send Request</CardTitle>
+              <CardTitle>Request a Confide</CardTitle>
               <CardDescription>
                 Add someone new to your confide list
               </CardDescription>
