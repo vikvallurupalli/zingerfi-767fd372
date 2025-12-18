@@ -87,7 +87,7 @@ export default function Index() {
           <div className="flex items-center justify-center gap-3 mb-8">
             <Sparkles className="h-6 w-6 text-primary animate-pulse" />
             <span className="text-2xl md:text-3xl font-bold text-primary tracking-wide italic">
-              This message will self destruct after reading (We mean it)
+              The messages will self destruct after 1 time decryption and reading (We mean it)
             </span>
             <Sparkles className="h-6 w-6 text-primary animate-pulse" />
           </div>
