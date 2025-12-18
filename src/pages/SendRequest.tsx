@@ -129,7 +129,7 @@ export default function SendRequest() {
           <CardHeader>
             <CardTitle>Request Details</CardTitle>
             <CardDescription>
-              Enter the email address of the person you want to add
+              Enter the gmail address of the person you want to add
             </CardDescription>
           </CardHeader>
           <CardContent>
