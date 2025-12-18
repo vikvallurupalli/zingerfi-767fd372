@@ -180,7 +180,7 @@ export default function SendRequest() {
           <CardContent className="pt-6">
             <h3 className="font-semibold mb-2">Important Notes</h3>
             <ul className="text-sm text-muted-foreground space-y-2">
-              <li>• The user must be registered on Zinger to receive your request</li>
+              <li>• The user must be registered on ZingerFi to receive your request</li>
               <li>• No email will be sent - they will see it when they log in</li>
               <li>• Once accepted, you can exchange encrypted messages</li>
               <li>• You can view pending requests on the "Pending" page</li>

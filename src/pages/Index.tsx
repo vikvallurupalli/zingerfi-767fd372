@@ -184,7 +184,7 @@ export default function Index() {
       {/* Footer */}
       <footer className="border-t py-8 bg-card/50">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>&copy; 2025 Zinger. Secure encryption for everyone.</p>
+          <p>&copy; 2025 ZingerFi. Secure encryption for everyone.</p>
         </div>
       </footer>
 
@@ -200,8 +200,8 @@ export default function Index() {
               <h3 className="text-xl font-semibold mb-2">iPhone / iPad (Safari)</h3>
               <ol className="list-decimal list-inside space-y-4 text-sm">
                 <li className="text-base">
-                  <span className="font-semibold">Open Zinger in Safari browser</span>
-                  <p className="text-muted-foreground mt-1">Launch your favorite browser and navigate to Zinger</p>
+                  <span className="font-semibold">Open ZingerFi in Safari browser</span>
+                  <p className="text-muted-foreground mt-1">Launch your favorite browser and navigate to ZingerFi</p>
                 </li>
                 <li className="text-base">
                   <span className="font-semibold">Tap the Share button</span>
@@ -222,8 +222,8 @@ export default function Index() {
               <h3 className="text-xl font-semibold mb-2">Android (Chrome)</h3>
               <ol className="list-decimal list-inside space-y-4 text-sm">
                 <li className="text-base">
-                  <span className="font-semibold">Open Zinger in Chrome browser</span>
-                  <p className="text-muted-foreground mt-1">Launch Chrome and navigate to Zinger</p>
+                  <span className="font-semibold">Open ZingerFi in Chrome browser</span>
+                  <p className="text-muted-foreground mt-1">Launch Chrome and navigate to ZingerFi</p>
                 </li>
                 <li className="text-base">
                   <span className="font-semibold">Tap the menu (three dots) in the top right</span>
@@ -247,7 +247,7 @@ export default function Index() {
       <Dialog open={showHowToUse} onOpenChange={setShowHowToUse}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-3xl">How to Use Zinger</DialogTitle>
+            <DialogTitle className="text-3xl">How to Use ZingerFi</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-6 py-4">

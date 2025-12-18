@@ -52,7 +52,7 @@ export default function Auth() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Welcome to Zinger</CardTitle>
+          <CardTitle className="text-2xl">Welcome to ZingerFi</CardTitle>
           <CardDescription>
             Secure end-to-end encrypted messaging using ECC-256
           </CardDescription>
@@ -85,7 +85,7 @@ export default function Auth() {
           </Button>
           
           <div className="text-center text-sm text-muted-foreground">
-            <p>By continuing, you agree to use Zinger's encryption services</p>
+            <p>By continuing, you agree to use ZingerFi's encryption services</p>
             <p className="mt-2">Your keys are generated locally and never shared</p>
           </div>
         </CardContent>

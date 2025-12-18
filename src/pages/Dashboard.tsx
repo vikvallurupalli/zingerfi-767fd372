@@ -14,7 +14,7 @@ export default function Dashboard() {
               <Shield className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold">Zinger Encryption Tool</h1>
+          <h1 className="text-4xl font-bold">ZingerFi Encryption Tool</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Secure end-to-end encryption using ECC-256. Encrypt messages for your trusted confides and decrypt messages you receive.
           </p>
@@ -84,7 +84,7 @@ export default function Dashboard() {
 
         <Card className="bg-secondary/20">
           <CardHeader>
-            <CardTitle>How Zinger Works</CardTitle>
+            <CardTitle>How ZingerFi Works</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-3">

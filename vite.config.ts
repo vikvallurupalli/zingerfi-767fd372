@@ -17,8 +17,8 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'Zinger - Secure Encryption',
-        short_name: 'Zinger',
+        name: 'ZingerFi - Secure Encryption',
+        short_name: 'ZingerFi',
         description: 'Secure end-to-end encrypted messaging tool',
         theme_color: '#0A76BD',
         background_color: '#ffffff',
