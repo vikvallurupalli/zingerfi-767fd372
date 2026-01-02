@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect, useState, useRef } from "r
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { toast } from "@/hooks/use-toast";
 import {
   generateKeyPair,
   exportPublicKey,
@@ -24,52 +23,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const sessionIdRef = useRef<string | null>(null);
   const hasHandledLoginRef = useRef<boolean>(false);
 
-  // Generate a unique session identifier
-  const generateSessionId = () => {
-    return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-  };
-
-  // Store session ID and update in database
-  const updateSessionInDb = async (userId: string, sessionId: string) => {
-    await supabase
-      .from("profiles")
-      .update({ current_session_id: sessionId })
-      .eq("id", userId);
-  };
-
-  // Validate current session against stored session
-  const validateSession = async (userId: string, currentSessionId: string): Promise<boolean> => {
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select("current_session_id")
-      .eq("id", userId)
-      .maybeSingle();
-
-    // If profile doesn't exist yet (first-time user), consider session valid
-    if (error || !profile) {
-      return true;
-    }
-    
-    // If profile exists but has no session ID yet, consider valid (first-time setup)
-    if (!profile.current_session_id) {
-      return true;
-    }
-
-    return profile.current_session_id === currentSessionId;
-  };
-
-  // Handle fresh login - generate new session and update DB
+  // Handle fresh login - set up keys for user
   const handleFreshLogin = async (userId: string) => {
     if (hasHandledLoginRef.current) return;
     hasHandledLoginRef.current = true;
 
-    const newSessionId = generateSessionId();
-    sessionIdRef.current = newSessionId;
-    localStorage.setItem(`session_id_${userId}`, newSessionId);
-    
     // Clear OAuth flag
     sessionStorage.removeItem('oauth_in_progress');
     
@@ -92,12 +52,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await new Promise(resolve => setTimeout(resolve, 500));
       retries++;
     }
-    
-    // Update session ID in DB
-    await supabase
-      .from("profiles")
-      .update({ current_session_id: newSessionId })
-      .eq("id", userId);
 
     if (profile && !profile.public_key) {
       // Generate keys for new user
@@ -120,70 +74,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    let isInitialized = false;
-    
-    // Check if this looks like an OAuth callback (URL contains access_token or code)
-    const urlParams = new URLSearchParams(window.location.search);
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const isOAuthCallback = 
-      sessionStorage.getItem('oauth_in_progress') === 'true' ||
-      hashParams.has('access_token') ||
-      urlParams.has('code');
-    
     const initializeAuth = async () => {
       const { data: { session: existingSession } } = await supabase.auth.getSession();
       
       if (!existingSession?.user) {
-        isInitialized = true;
         setLoading(false);
         return;
       }
 
-      const userId = existingSession.user.id;
-      const storedSessionId = localStorage.getItem(`session_id_${userId}`);
+      setSession(existingSession);
+      setUser(existingSession.user);
       
-      // Case 1: OAuth callback - this is a fresh login, always create new session
-      if (isOAuthCallback && !hasHandledLoginRef.current) {
-        setSession(existingSession);
-        setUser(existingSession.user);
-        await handleFreshLogin(userId);
-        isInitialized = true;
-        setLoading(false);
-        return;
+      // Handle key setup for returning user
+      if (!hasHandledLoginRef.current) {
+        await handleFreshLogin(existingSession.user.id);
       }
       
-      // Case 2: We have a local session ID - this is a page refresh or returning user
-      if (storedSessionId) {
-        sessionIdRef.current = storedSessionId;
-        
-        const isValid = await validateSession(userId, storedSessionId);
-        if (isValid) {
-          // Session is valid, restore state
-          setSession(existingSession);
-          setUser(existingSession.user);
-        } else {
-          // Session was invalidated by login from another device
-          localStorage.removeItem(`session_id_${userId}`);
-          sessionIdRef.current = null;
-          toast({
-            title: "Session Expired",
-            description: "You have been logged out because you logged in from another device or browser.",
-            variant: "destructive",
-            duration: 10000,
-          });
-          await supabase.auth.signOut();
-          setUser(null);
-          setSession(null);
-        }
-      }
-      // Case 3: No local session ID and no OAuth flag - stale session, logout
-      else {
-        await supabase.auth.signOut();
-        setUser(null);
-        setSession(null);
-      }
-      
-      isInitialized = true;
       setLoading(false);
     };
 
@@ -191,20 +97,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === "SIGNED_IN" && session?.user) {
-          const userId = session.user.id;
-          const existingLocalSessionId = localStorage.getItem(`session_id_${userId}`);
+          setSession(session);
+          setUser(session.user);
           
-          // Only handle as fresh login if no local session exists and login wasn't already handled
-          if (!existingLocalSessionId && !hasHandledLoginRef.current) {
-            setSession(session);
-            setUser(session.user);
-            await handleFreshLogin(userId);
-            setLoading(false);
-          } else if (existingLocalSessionId && isInitialized) {
-            // Token refresh - just update state
-            setSession(session);
-            setUser(session.user);
+          if (!hasHandledLoginRef.current) {
+            await handleFreshLogin(session.user.id);
           }
+          setLoading(false);
         } else if (event === "SIGNED_OUT") {
           hasHandledLoginRef.current = false;
           setSession(null);
@@ -222,55 +121,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Periodic session validation
-  useEffect(() => {
-    if (!user || !sessionIdRef.current) return;
-
-    const intervalId = setInterval(async () => {
-      if (user && sessionIdRef.current) {
-        const isValid = await validateSession(user.id, sessionIdRef.current);
-        if (!isValid) {
-          toast({
-            title: "Session Expired",
-            description: "You have been logged out because you logged in from another device or browser.",
-            variant: "destructive",
-            duration: 10000,
-          });
-          await supabase.auth.signOut();
-          navigate("/");
-        }
-      }
-    }, 5000);
-
-    return () => clearInterval(intervalId);
-  }, [user, navigate]);
-
   const signOut = async () => {
     try {
-      const userId = user?.id;
-      const localSessionId = userId ? localStorage.getItem(`session_id_${userId}`) : null;
-      
-      if (userId) {
-        localStorage.removeItem(`session_id_${userId}`);
-        sessionIdRef.current = null;
-        hasHandledLoginRef.current = false;
-        
-        // Only clear DB session if this browser owns it
-        if (localSessionId) {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("current_session_id")
-            .eq("id", userId)
-            .single();
-          
-          if (profile?.current_session_id === localSessionId) {
-            await supabase
-              .from("profiles")
-              .update({ current_session_id: null })
-              .eq("id", userId);
-          }
-        }
-      }
+      hasHandledLoginRef.current = false;
       
       const { error } = await supabase.auth.signOut();
       if (error) {
