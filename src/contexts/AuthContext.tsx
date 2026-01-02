@@ -122,8 +122,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let isInitialized = false;
     
-    // Check if this looks like an OAuth callback
-    const isOAuthCallback = sessionStorage.getItem('oauth_in_progress') === 'true';
+    // Check if this looks like an OAuth callback (URL contains access_token or code)
+    const urlParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const isOAuthCallback = 
+      sessionStorage.getItem('oauth_in_progress') === 'true' ||
+      hashParams.has('access_token') ||
+      urlParams.has('code');
     
     const initializeAuth = async () => {
       const { data: { session: existingSession } } = await supabase.auth.getSession();
@@ -137,7 +142,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const userId = existingSession.user.id;
       const storedSessionId = localStorage.getItem(`session_id_${userId}`);
       
-      // Case 1: We have a local session ID - this is a page refresh or returning user
+      // Case 1: OAuth callback - this is a fresh login, always create new session
+      if (isOAuthCallback && !hasHandledLoginRef.current) {
+        setSession(existingSession);
+        setUser(existingSession.user);
+        await handleFreshLogin(userId);
+        isInitialized = true;
+        setLoading(false);
+        return;
+      }
+      
+      // Case 2: We have a local session ID - this is a page refresh or returning user
       if (storedSessionId) {
         sessionIdRef.current = storedSessionId;
         
@@ -160,12 +175,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(null);
           setSession(null);
         }
-      }
-      // Case 2: No local session ID but OAuth in progress - this is a fresh login callback
-      else if (isOAuthCallback) {
-        setSession(existingSession);
-        setUser(existingSession.user);
-        await handleFreshLogin(userId);
       }
       // Case 3: No local session ID and no OAuth flag - stale session, logout
       else {
