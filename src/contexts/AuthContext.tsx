@@ -84,13 +84,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setSession(existingSession);
       setUser(existingSession.user);
-      
-      // Handle key setup for returning user
-      if (!hasHandledLoginRef.current) {
-        await handleFreshLogin(existingSession.user.id);
-      }
-      
       setLoading(false);
+      
+      // Handle key setup in background - don't block UI
+      if (!hasHandledLoginRef.current) {
+        handleFreshLogin(existingSession.user.id);
+      }
     };
 
     // Set up auth state listener
@@ -99,11 +98,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (event === "SIGNED_IN" && session?.user) {
           setSession(session);
           setUser(session.user);
-          
-          if (!hasHandledLoginRef.current) {
-            await handleFreshLogin(session.user.id);
-          }
           setLoading(false);
+          
+          // Handle key setup in background - don't block UI
+          if (!hasHandledLoginRef.current) {
+            handleFreshLogin(session.user.id);
+          }
         } else if (event === "SIGNED_OUT") {
           hasHandledLoginRef.current = false;
           setSession(null);
