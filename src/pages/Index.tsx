@@ -87,7 +87,7 @@ export default function Index() {
           <div className="flex items-center justify-center gap-3 mb-8">
             <Sparkles className="h-6 w-6 text-primary animate-pulse" />
             <span className="text-2xl md:text-3xl font-bold text-primary tracking-wide italic">
-              The messages will self destruct after 1 time decryption and reading (We mean it)
+              Send encrypted messages to your friends and only your friend can decrypt and read it once (No more).
             </span>
             <Sparkles className="h-6 w-6 text-primary animate-pulse" />
           </div>
