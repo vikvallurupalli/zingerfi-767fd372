@@ -32,14 +32,6 @@ interface Confide {
   };
 }
 
-// Simple hash function for message tracking
-async function hashMessage(message: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(message);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
 
 export default function Decrypt() {
   const { user } = useAuth();
@@ -93,12 +85,10 @@ export default function Decrypt() {
     setLoading(true);
     try {
       // Check if message was already decrypted
-      const messageHash = await hashMessage(encryptedText);
-      
       const { data: existingDecryption, error: checkError } = await supabase
         .from("decrypted_messages")
         .select("id")
-        .eq("message_hash", messageHash)
+        .eq("message_hash", encryptedText)
         .maybeSingle();
 
       if (checkError) {
@@ -141,7 +131,7 @@ export default function Decrypt() {
       const { error: insertError } = await supabase
         .from("decrypted_messages")
         .insert({
-          message_hash: messageHash,
+          message_hash: encryptedText,
           decrypted_by: user.id
         });
 
