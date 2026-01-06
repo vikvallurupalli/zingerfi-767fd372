@@ -16,6 +16,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   decryptMessage,
   importPublicKey,
   importPrivateKey,
@@ -41,6 +50,7 @@ export default function Decrypt() {
   const [decryptedMessage, setDecryptedMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [confides, setConfides] = useState<Confide[]>([]);
+  const [showWarningModal, setShowWarningModal] = useState(false);
 
   useEffect(() => {
     loadConfides();
@@ -141,7 +151,7 @@ export default function Decrypt() {
       }
 
       setDecryptedMessage(decrypted);
-      toast.success("Message decrypted successfully");
+      setShowWarningModal(true);
     } catch (error) {
       console.error("Decryption error:", error);
       toast.error("Failed to decrypt message. Please check the sender email and encrypted text.");
@@ -257,6 +267,22 @@ export default function Decrypt() {
           </Card>
         </div>
       </div>
+
+      <AlertDialog open={showWarningModal} onOpenChange={setShowWarningModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Message Decrypted</AlertDialogTitle>
+            <AlertDialogDescription>
+              This message cannot be decrypted again. Please save the decrypted message if you need to.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowWarningModal(false)}>
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Layout>
   );
 }
