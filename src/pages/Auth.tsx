@@ -13,7 +13,9 @@ export default function Auth() {
 
   useEffect(() => {
     if (user) {
-      navigate("/dashboard");
+      const redirectUrl = sessionStorage.getItem('redirectAfterLogin') || '/dashboard';
+      sessionStorage.removeItem('redirectAfterLogin');
+      navigate(redirectUrl);
     }
   }, [user, navigate]);
 
@@ -24,7 +26,9 @@ export default function Auth() {
       // Set flag to indicate OAuth is in progress
       sessionStorage.setItem('oauth_in_progress', 'true');
       
-      const redirectUrl = `${window.location.origin}/dashboard`
+      // Use stored redirect URL or default to dashboard
+      const storedRedirect = sessionStorage.getItem('redirectAfterLogin') || '/dashboard';
+      const redirectUrl = `${window.location.origin}${storedRedirect}`;
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",

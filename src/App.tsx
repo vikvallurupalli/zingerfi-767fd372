@@ -19,12 +19,16 @@ const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
+  const location = window.location;
 
   if (loading) {
     return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
   }
 
   if (!user) {
+    // Store the intended URL for redirect after login
+    const intendedUrl = location.pathname + location.search;
+    sessionStorage.setItem('redirectAfterLogin', intendedUrl);
     return <Navigate to="/auth" replace />;
   }
 
