@@ -72,19 +72,30 @@ export default function Index() {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            {user && (
-              <span className="text-sm text-muted-foreground hidden md:inline px-3 py-1 bg-secondary rounded-full">
-                {user.email}
-              </span>
-            )}
-            <Button onClick={handleGetStarted} size="lg" className="shadow-md hover:shadow-lg transition-shadow">
-              {user ? "Go to Dashboard" : "Encrypt Message"}
-            </Button>
-            {user && (
-              <Button variant="outline" onClick={signOut} className="gap-2">
-                <LogOut className="h-4 w-4" />
-                <span className="hidden md:inline">Logout</span>
-              </Button>
+            {user ? (
+              <>
+                <span className="text-sm text-muted-foreground hidden md:inline px-3 py-1 bg-secondary rounded-full">
+                  {user.email}
+                </span>
+                <Button onClick={handleGetStarted} size="lg" className="shadow-md hover:shadow-lg transition-shadow">
+                  Go to Dashboard
+                </Button>
+                <Button variant="outline" onClick={signOut} className="gap-2">
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden md:inline">Logout</span>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button onClick={handleRegister} size="lg" className="shadow-md hover:shadow-lg transition-shadow gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Register
+                </Button>
+                <Button variant="outline" onClick={handleLogin} size="lg" className="gap-2">
+                  <Lock className="h-4 w-4" />
+                  Login
+                </Button>
+              </>
             )}
           </div>
         </div>
