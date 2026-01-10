@@ -153,7 +153,7 @@ export default function Encrypt() {
               className="h-8 text-sm px-4 w-fit"
               onClick={() => window.location.href = '/send-request'}
             >
-              Add Confidee
+              Add Confidee if not found in dropdown below
             </Button>
             <CardTitle className="mt-4">Select Confide</CardTitle>
             <CardDescription>Choose who can decrypt this message</CardDescription>
