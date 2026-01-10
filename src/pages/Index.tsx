@@ -48,6 +48,16 @@ export default function Index() {
     }
   };
 
+  const handleRegister = () => {
+    sessionStorage.setItem('authMode', 'register');
+    navigate("/auth");
+  };
+
+  const handleLogin = () => {
+    sessionStorage.setItem('authMode', 'login');
+    navigate("/auth");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">
       {/* Header */}
@@ -115,11 +125,24 @@ export default function Index() {
                   Begin securing your messages now
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <Button size="lg" onClick={handleGetStarted} className="w-full gap-2 h-12 text-lg shadow-md">
-                  <Lock className="h-5 w-5" />
-                  {user ? "Go to Dashboard" : "Encrypt Message"}
-                </Button>
+              <CardContent className="space-y-3">
+                {user ? (
+                  <Button size="lg" onClick={handleGetStarted} className="w-full gap-2 h-12 text-lg shadow-md">
+                    <Lock className="h-5 w-5" />
+                    Go to Dashboard
+                  </Button>
+                ) : (
+                  <>
+                    <Button size="lg" onClick={handleRegister} className="w-full gap-2 h-12 text-lg shadow-md">
+                      <UserPlus className="h-5 w-5" />
+                      Register
+                    </Button>
+                    <Button size="lg" variant="outline" onClick={handleLogin} className="w-full gap-2 h-12 text-lg">
+                      <Lock className="h-5 w-5" />
+                      Login
+                    </Button>
+                  </>
+                )}
               </CardContent>
             </Card>
 

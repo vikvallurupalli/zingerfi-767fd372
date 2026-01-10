@@ -1,11 +1,79 @@
+import { useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Lock, Unlock, Users, Send, Shield } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [welcomeMessage, setWelcomeMessage] = useState("");
+
+  useEffect(() => {
+    const checkAuthMode = async () => {
+      const authMode = sessionStorage.getItem('authMode');
+      
+      // Only show popup if coming from Register button
+      if (authMode === 'register' && user) {
+        sessionStorage.removeItem('authMode');
+        
+        // Check if user was created recently (within 30 seconds)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('created_at')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile) {
+          const createdAt = new Date(profile.created_at);
+          const now = new Date();
+          const diffInSeconds = (now.getTime() - createdAt.getTime()) / 1000;
+          
+          if (diffInSeconds < 30) {
+            setWelcomeMessage("You have registered successfully. Enjoy encrypting.");
+          } else {
+            setWelcomeMessage("You are an already registered user. Enjoy encrypting.");
+          }
+          setShowWelcomeModal(true);
+        }
+      } else if (authMode) {
+        // Clean up authMode for login (no popup shown)
+        sessionStorage.removeItem('authMode');
+      }
+    };
+
+    checkAuthMode();
+  }, [user]);
+
   return (
+    <>
+      <AlertDialog open={showWelcomeModal} onOpenChange={setShowWelcomeModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Welcome to ZingerFi!</AlertDialogTitle>
+            <AlertDialogDescription>
+              {welcomeMessage}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowWelcomeModal(false)}>
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     <Layout>
       <div className="space-y-8">
         <div className="text-center space-y-2">
@@ -111,5 +179,6 @@ export default function Dashboard() {
         </Card>
       </div>
     </Layout>
+    </>
   );
 }
