@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,14 +7,65 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Send } from "lucide-react";
+import { Send, CreditCard, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function SendRequest() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [alias, setAlias] = useState("");
   const [loading, setLoading] = useState(false);
+  const [confideCount, setConfideCount] = useState(0);
+  const [loadingCount, setLoadingCount] = useState(true);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+
+  // Fetch confide count on mount
+  useEffect(() => {
+    const fetchConfideCount = async () => {
+      if (!user) return;
+      
+      const { count, error } = await supabase
+        .from("confides")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
+      
+      if (!error && count !== null) {
+        setConfideCount(count);
+      }
+      setLoadingCount(false);
+    };
+
+    fetchConfideCount();
+  }, [user]);
+
+  // Handle payment success from URL params
+  useEffect(() => {
+    const paymentStatus = searchParams.get("payment");
+    if (paymentStatus === "success") {
+      toast.success("Payment successful! You can now add another confide.");
+    } else if (paymentStatus === "cancelled") {
+      toast.info("Payment was cancelled.");
+    }
+  }, [searchParams]);
+
+  const handlePayment = async () => {
+    setPaymentLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-confide-payment");
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      }
+    } catch (error: any) {
+      console.error("Payment error:", error);
+      toast.error("Failed to initiate payment: " + (error?.message || "Unknown error"));
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
+  const requiresPayment = confideCount >= 1;
 
   const handleSendRequest = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,6 +162,16 @@ export default function SendRequest() {
     }
   };
 
+  if (loadingCount) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="max-w-2xl mx-auto space-y-6">
@@ -125,56 +187,87 @@ export default function SendRequest() {
           </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Request Details</CardTitle>
-            <CardDescription>
-              Enter the gmail address of the person you want to add
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSendRequest} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address (Case sensitive)</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="recipient@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <p className="text-sm text-muted-foreground">
-                  The recipient will receive a notification about your request
-                </p>
+        {requiresPayment ? (
+          <Card className="border-primary/50">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5 text-primary" />
+                <CardTitle>Unlock Additional Confide</CardTitle>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="alias">Alias (Optional)</Label>
-                <Input
-                  id="alias"
-                  type="text"
-                  placeholder="e.g., Best Friend, Mom, Work Partner"
-                  value={alias}
-                  onChange={(e) => setAlias(e.target.value)}
-                  maxLength={100}
-                />
-                <p className="text-sm text-muted-foreground">
-                  Give this person a nickname that only you will see
-                </p>
-              </div>
-
+              <CardDescription>
+                You already have {confideCount} confide{confideCount > 1 ? "s" : ""}. To add more, a one-time payment of $0.99 is required.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                This helps us maintain the service and ensures quality connections.
+              </p>
               <Button
-                type="submit"
-                disabled={loading || !email}
+                onClick={handlePayment}
+                disabled={paymentLoading}
                 className="w-full gap-2"
               >
-                <Send className="h-4 w-4" />
-                Send Request
+                {paymentLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CreditCard className="h-4 w-4" />
+                )}
+                Pay $0.99 to Unlock
               </Button>
-            </form>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle>Request Details</CardTitle>
+              <CardDescription>
+                Enter the gmail address of the person you want to add
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSendRequest} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address (Case sensitive)</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="recipient@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    The recipient will receive a notification about your request
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="alias">Alias (Optional)</Label>
+                  <Input
+                    id="alias"
+                    type="text"
+                    placeholder="e.g., Best Friend, Mom, Work Partner"
+                    value={alias}
+                    onChange={(e) => setAlias(e.target.value)}
+                    maxLength={100}
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Give this person a nickname that only you will see
+                  </p>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={loading || !email}
+                  className="w-full gap-2"
+                >
+                  <Send className="h-4 w-4" />
+                  Send Request
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="bg-secondary/20">
           <CardContent className="pt-6">
