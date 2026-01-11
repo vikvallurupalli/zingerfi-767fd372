@@ -12,13 +12,14 @@ import { toast } from "sonner";
 
 export default function SendRequest() {
   const { user } = useAuth();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [alias, setAlias] = useState("");
   const [loading, setLoading] = useState(false);
   const [confideCount, setConfideCount] = useState(0);
   const [loadingCount, setLoadingCount] = useState(true);
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentUnlocked, setPaymentUnlocked] = useState(false);
 
   // Fetch confide count on mount
   useEffect(() => {
@@ -44,10 +45,14 @@ export default function SendRequest() {
     const paymentStatus = searchParams.get("payment");
     if (paymentStatus === "success") {
       toast.success("Payment successful! You can now add another confide.");
+      setPaymentUnlocked(true);
+      // Clear the URL param to prevent re-triggering on refresh
+      setSearchParams({}, { replace: true });
     } else if (paymentStatus === "cancelled") {
       toast.info("Payment was cancelled.");
+      setSearchParams({}, { replace: true });
     }
-  }, [searchParams]);
+  }, [searchParams, setSearchParams]);
 
   const handlePayment = async () => {
     setPaymentLoading(true);
@@ -65,7 +70,8 @@ export default function SendRequest() {
     }
   };
 
-  const requiresPayment = confideCount >= 1;
+  // Payment is required if user has 1+ confides AND hasn't just paid
+  const requiresPayment = confideCount >= 1 && !paymentUnlocked;
 
   const handleSendRequest = async (e: React.FormEvent) => {
     e.preventDefault();
