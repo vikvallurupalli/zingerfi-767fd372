@@ -56,6 +56,27 @@ export type Database = {
           },
         ]
       }
+      confide_unlocks: {
+        Row: {
+          created_at: string
+          id: string
+          stripe_session_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          stripe_session_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          stripe_session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       confides: {
         Row: {
           alias: string | null

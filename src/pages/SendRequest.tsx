@@ -21,11 +21,12 @@ export default function SendRequest() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentUnlocked, setPaymentUnlocked] = useState(false);
 
-  // Fetch confide count on mount
+  // Fetch confide count and check for existing unlocks on mount
   useEffect(() => {
-    const fetchConfideCount = async () => {
+    const fetchData = async () => {
       if (!user) return;
       
+      // Fetch confide count
       const { count, error } = await supabase
         .from("confides")
         .select("*", { count: "exact", head: true })
@@ -34,24 +35,52 @@ export default function SendRequest() {
       if (!error && count !== null) {
         setConfideCount(count);
       }
+
+      // Check if user has any payment unlocks
+      const { data: unlocks } = await supabase
+        .from("confide_unlocks")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1);
+
+      if (unlocks && unlocks.length > 0) {
+        setPaymentUnlocked(true);
+      }
+
       setLoadingCount(false);
     };
 
-    fetchConfideCount();
+    fetchData();
   }, [user]);
 
-  // Handle payment success from URL params
+  // Handle payment success from URL params and record the payment
   useEffect(() => {
     const paymentStatus = searchParams.get("payment");
-    if (paymentStatus === "success") {
-      toast.success("Payment successful! You can now add another confide.");
-      setPaymentUnlocked(true);
-      // Clear the URL param to prevent re-triggering on refresh
-      setSearchParams({}, { replace: true });
-    } else if (paymentStatus === "cancelled") {
-      toast.info("Payment was cancelled.");
-      setSearchParams({}, { replace: true });
-    }
+    const sessionId = searchParams.get("session_id");
+
+    const recordPayment = async () => {
+      if (paymentStatus === "success" && sessionId) {
+        try {
+          // Record the payment in the database
+          await supabase.functions.invoke("record-confide-payment", {
+            body: { session_id: sessionId },
+          });
+          toast.success("Payment successful! You can now add another confide.");
+          setPaymentUnlocked(true);
+        } catch (error) {
+          console.error("Error recording payment:", error);
+          toast.success("Payment successful! You can now add another confide.");
+          setPaymentUnlocked(true);
+        }
+        // Clear the URL params
+        setSearchParams({}, { replace: true });
+      } else if (paymentStatus === "cancelled") {
+        toast.info("Payment was cancelled.");
+        setSearchParams({}, { replace: true });
+      }
+    };
+
+    recordPayment();
   }, [searchParams, setSearchParams]);
 
 //   const handlePayment = async () => {
