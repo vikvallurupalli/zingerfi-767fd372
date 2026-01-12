@@ -55,20 +55,44 @@ export default function SendRequest() {
   }, [searchParams, setSearchParams]);
 
   const handlePayment = async () => {
-    setPaymentLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("create-confide-payment");
-      if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, "_blank");
-      }
-    } catch (error: any) {
-      console.error("Payment error:", error);
-      toast.error("Failed to initiate payment: " + (error?.message || "Unknown error"));
-    } finally {
-      setPaymentLoading(false);
-    }
-  };
+  setPaymentLoading(true);
+  try {
+    const { data, error } = await supabase.functions.invoke("create-confide-payment");
+    if (error) throw error;
+    
+    // Initialize embedded checkout
+    const stripe = await stripePromise;
+    if (!stripe) throw new Error('Stripe failed to load');
+    
+    const checkout = await stripe.initEmbeddedCheckout({
+      clientSecret: data.clientSecret,
+    });
+    
+    // Mount checkout in the page
+    checkout.mount('#checkout-container');
+    
+  } catch (error: any) {
+    console.error("Payment error:", error);
+    toast.error("Failed to initiate payment: " + (error?.message || "Unknown error"));
+  } finally {
+    setPaymentLoading(false);
+  }
+};
+  // const handlePayment = async () => {
+  //   setPaymentLoading(true);
+  //   try {
+  //     const { data, error } = await supabase.functions.invoke("create-confide-payment");
+  //     if (error) throw error;
+  //     if (data?.url) {
+  //       window.open(data.url, "_blank");
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Payment error:", error);
+  //     toast.error("Failed to initiate payment: " + (error?.message || "Unknown error"));
+  //   } finally {
+  //     setPaymentLoading(false);
+  //   }
+  // };
 
   // Payment is required if user has 1+ confides AND hasn't just paid
   const requiresPayment = confideCount >= 1 && !paymentUnlocked;
