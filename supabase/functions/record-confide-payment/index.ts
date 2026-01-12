@@ -24,33 +24,33 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
 
+    const { session_id } = await req.json();
+    if (!session_id) throw new Error("Session ID is required");
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Check if a Stripe customer record exists for this user
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
+    // Verify the checkout session is paid
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+    if (session.payment_status !== "paid") {
+      throw new Error("Payment not completed");
     }
 
-    // Create a one-time payment session for unlocking additional confide
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      customer_email: customerId ? undefined : user.email,
-      line_items: [
-        {
-          price: "price_1SoT2AL4SbRPwtxKhfP6sluf",
-          quantity: 1,
-        },
-      ],
-      mode: "payment",
-      success_url: `${req.headers.get("origin")}/send-request?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/send-request?payment=cancelled`,
-    });
+    // Record the unlock in the database
+    const { error: insertError } = await supabaseClient
+      .from("confide_unlocks")
+      .insert({
+        user_id: user.id,
+        stripe_session_id: session_id,
+      });
 
-    return new Response(JSON.stringify({ url: session.url }), {
+    // Ignore duplicate key errors (already recorded)
+    if (insertError && !insertError.message.includes("duplicate")) {
+      throw insertError;
+    }
+
+    return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
