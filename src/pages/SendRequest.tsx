@@ -59,38 +59,63 @@ export default function SendRequest() {
     const sessionId = searchParams.get("session_id");
 
     const recordPayment = async () => {
-      if (paymentStatus === "success" && sessionId && user) {
-        try {
-          // Record the payment in the database
-          const { data, error } = await supabase.functions.invoke("record-confide-payment", {
-            body: { session_id: sessionId },
-          });
-          
-          if (error) {
-            console.error("Error recording payment:", error);
-            toast.error("Failed to record payment: " + error.message);
-          } else if (data?.error) {
-            console.error("Error from function:", data.error);
-            toast.error("Failed to record payment: " + data.error);
-          } else {
-            toast.success("Payment successful! You can now add another confide.");
-            setPaymentUnlocked(true);
-          }
-        } catch (error: any) {
+      if (paymentStatus !== "success") return;
+
+      if (!sessionId) {
+        toast.error("Payment succeeded, but the session id is missing. Please return using the button in Stripe checkout.");
+        return;
+      }
+
+      // Make sure we have an auth session (AuthContext can lag behind on initial load)
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+
+      if (sessionError || !accessToken) {
+        toast.error("Please log in again to finish unlocking.");
+        // Don't clear URL params; user can log in and we can retry.
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.functions.invoke("record-confide-payment", {
+          body: { session_id: sessionId },
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (error) {
           console.error("Error recording payment:", error);
-          toast.error("Failed to record payment: " + (error?.message || "Unknown error"));
+          toast.error("Failed to record payment: " + error.message);
+          return;
         }
-        // Clear the URL params
+
+        if (data?.error) {
+          console.error("Error from function:", data.error);
+          toast.error("Failed to record payment: " + data.error);
+          return;
+        }
+
+        toast.success("Payment successful! You can now add another confide.");
+        setPaymentUnlocked(true);
+
+        // Only clear params after we have successfully recorded the unlock
         setSearchParams({}, { replace: true });
-      } else if (paymentStatus === "cancelled") {
-        toast.info("Payment was cancelled.");
-        setSearchParams({}, { replace: true });
+      } catch (err: any) {
+        console.error("Error recording payment:", err);
+        toast.error("Failed to record payment: " + (err?.message || "Unknown error"));
+        // Don't clear params on failure; it allows retry.
       }
     };
 
-    recordPayment();
-  }, [searchParams, setSearchParams, user]);
+    if (paymentStatus === "cancelled") {
+      toast.info("Payment was cancelled.");
+      setSearchParams({}, { replace: true });
+      return;
+    }
 
+    void recordPayment();
+  }, [searchParams, setSearchParams]);
 //   const handlePayment = async () => {
 //   setPaymentLoading(true);
 //   try {
