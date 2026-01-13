@@ -14,25 +14,38 @@ serve(async (req) => {
 
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    { auth: { persistSession: false } }
   );
 
   try {
-    const authHeader = req.headers.get("Authorization")!;
+    console.log("[record-confide-payment] start");
+
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("Missing Authorization header");
     const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
+
+    const { data, error: userError } = await supabaseClient.auth.getUser(token);
+    if (userError) throw userError;
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
+
+    console.log("[record-confide-payment] authed", { userId: user.id, email: user.email });
 
     const { session_id } = await req.json();
     if (!session_id) throw new Error("Session ID is required");
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
+
+    const stripe = new Stripe(stripeKey, {
       apiVersion: "2025-08-27.basil",
     });
 
     // Verify the checkout session is paid
+    console.log("[record-confide-payment] retrieving session", { session_id });
     const session = await stripe.checkout.sessions.retrieve(session_id);
+    console.log("[record-confide-payment] session status", { payment_status: session.payment_status });
     if (session.payment_status !== "paid") {
       throw new Error("Payment not completed");
     }
@@ -45,10 +58,15 @@ serve(async (req) => {
         stripe_session_id: session_id,
       });
 
-    // Ignore duplicate key errors (already recorded)
-    if (insertError && !insertError.message.includes("duplicate")) {
-      throw insertError;
+    if (insertError) {
+      console.log("[record-confide-payment] insert error", { message: insertError.message });
+      // Ignore duplicate key errors (already recorded)
+      if (!insertError.message.toLowerCase().includes("duplicate")) {
+        throw insertError;
+      }
     }
+
+    console.log("[record-confide-payment] recorded");
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
