@@ -59,18 +59,26 @@ export default function SendRequest() {
     const sessionId = searchParams.get("session_id");
 
     const recordPayment = async () => {
-      if (paymentStatus === "success" && sessionId) {
+      if (paymentStatus === "success" && sessionId && user) {
         try {
           // Record the payment in the database
-          await supabase.functions.invoke("record-confide-payment", {
+          const { data, error } = await supabase.functions.invoke("record-confide-payment", {
             body: { session_id: sessionId },
           });
-          toast.success("Payment successful! You can now add another confide.");
-          setPaymentUnlocked(true);
-        } catch (error) {
+          
+          if (error) {
+            console.error("Error recording payment:", error);
+            toast.error("Failed to record payment: " + error.message);
+          } else if (data?.error) {
+            console.error("Error from function:", data.error);
+            toast.error("Failed to record payment: " + data.error);
+          } else {
+            toast.success("Payment successful! You can now add another confide.");
+            setPaymentUnlocked(true);
+          }
+        } catch (error: any) {
           console.error("Error recording payment:", error);
-          toast.success("Payment successful! You can now add another confide.");
-          setPaymentUnlocked(true);
+          toast.error("Failed to record payment: " + (error?.message || "Unknown error"));
         }
         // Clear the URL params
         setSearchParams({}, { replace: true });
@@ -81,7 +89,7 @@ export default function SendRequest() {
     };
 
     recordPayment();
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, user]);
 
 //   const handlePayment = async () => {
 //   setPaymentLoading(true);
