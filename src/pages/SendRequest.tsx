@@ -324,7 +324,7 @@ export default function SendRequest() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="recipient@example.com"
+                    placeholder="recipient@gmail.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
