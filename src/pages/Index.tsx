@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Shield, Lock, Users, Smartphone, Share2, UserPlus, Mail, Key, LogOut, Sparkles } from "lucide-react";
+import { Lock, Users, Smartphone, Share2, UserPlus, Mail, Key, LogOut, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import iphoneImage from "@/assets/iphoneImage.png";
+import logo from "@/assets/logo.png";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -64,9 +65,7 @@ export default function Index() {
       <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
-              <Shield className="h-7 w-7 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="ZingerFi Logo" className="h-12 w-12 rounded-xl object-contain" />
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               ZingerFi
             </h1>
