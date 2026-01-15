@@ -65,7 +65,7 @@ export default function Index() {
       <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="ZingerFi Logo" className="h-12 w-12 rounded-xl object-contain" />
+            <img src={logo} alt="ZingerFi Logo" className="h-24 w-24 rounded-xl object-contain" />
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               ZingerFi
             </h1>
