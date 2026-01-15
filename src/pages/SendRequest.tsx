@@ -21,19 +21,27 @@ export default function SendRequest() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentUnlocked, setPaymentUnlocked] = useState(false);
 
-  // Fetch confide count and check for existing unlocks on mount
+  // Fetch confide count (accepted + pending) and check for existing unlocks on mount
   useEffect(() => {
     const fetchData = async () => {
       if (!user) return;
       
-      // Fetch confide count
-      const { count, error } = await supabase
+      // Fetch accepted confides count
+      const { count: acceptedCount, error: confideError } = await supabase
         .from("confides")
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id);
       
-      if (!error && count !== null) {
-        setConfideCount(count);
+      // Fetch pending outgoing requests count
+      const { count: pendingCount, error: pendingError } = await supabase
+        .from("confide_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("sender_id", user.id)
+        .eq("status", "pending");
+      
+      if (!confideError && !pendingError) {
+        // Total count = accepted confides + pending outgoing requests
+        setConfideCount((acceptedCount || 0) + (pendingCount || 0));
       }
 
       // Check if user has any payment unlocks
