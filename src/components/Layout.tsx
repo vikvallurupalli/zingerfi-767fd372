@@ -14,6 +14,7 @@ import {
   LogOut,
   Shield,
 } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 interface LayoutProps {
   children: ReactNode;
@@ -86,8 +87,8 @@ export function Layout({ children }: LayoutProps) {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2">
-              <Shield className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold text-foreground">Zinger</span>
+              <img src={logo} alt="ZingerFi Logo" className="h-8 w-8 object-contain" />
+              <span className="text-xl font-bold text-foreground">ZingerFi</span>
             </Link>
 
             <div className="flex items-center space-x-1">
