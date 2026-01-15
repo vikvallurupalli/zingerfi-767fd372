@@ -104,7 +104,7 @@ export default function SendRequest() {
           return;
         }
 
-        toast.success("Payment successful! You can now add another confide.");
+        toast.success("Payment successful! You can now add another confidee.");
         setPaymentUnlocked(true);
 
         // Only clear params after we have successfully recorded the unlock
@@ -165,7 +165,7 @@ export default function SendRequest() {
     }
   };
 
-  // Payment is required if user has 1+ confides AND hasn't just paid
+  // Payment is required if user has 1+ confidees AND hasn't just paid
   const requiresPayment = confideCount >= 3 && !paymentUnlocked;
 
   const handleSendRequest = async (e: React.FormEvent) => {
@@ -213,7 +213,7 @@ export default function SendRequest() {
       }
 
       if (existingConfide) {
-        toast.error("This user is already in your confide list");
+        toast.error("This user is already in your confidee list");
         return;
       }
 
@@ -282,9 +282,9 @@ export default function SendRequest() {
               <Send className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold">Send Confide Request</h1>
+          <h1 className="text-3xl font-bold">Send Confidee Request</h1>
           <p className="text-muted-foreground">
-            Add someone to your confide list by their email
+            Add someone to your confidee list by their email
           </p>
         </div>
 
@@ -293,10 +293,10 @@ export default function SendRequest() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <CreditCard className="h-5 w-5 text-primary" />
-                <CardTitle>Unlock Additional Confide</CardTitle>
+                <CardTitle>Unlock Additional Confidees</CardTitle>
               </div>
               <CardDescription>
-                You already have {confideCount} confide{confideCount > 3 ? "s" : ""}. To add more, a one-time payment of $0.99 is required.
+                You already have {confideCount} confidees including pending confidees{confideCount > 3 ? "s" : ""}. To add more, a one-time payment of $0.99 is required.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
