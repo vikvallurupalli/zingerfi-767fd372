@@ -158,7 +158,7 @@ export default function SendRequest() {
   };
 
   // Payment is required if user has 1+ confides AND hasn't just paid
-  const requiresPayment = confideCount >= 1 && !paymentUnlocked;
+  const requiresPayment = confideCount >= 3 && !paymentUnlocked;
 
   const handleSendRequest = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -288,7 +288,7 @@ export default function SendRequest() {
                 <CardTitle>Unlock Additional Confide</CardTitle>
               </div>
               <CardDescription>
-                You already have {confideCount} confide{confideCount > 1 ? "s" : ""}. To add more, a one-time payment of $0.99 is required.
+                You already have {confideCount} confide{confideCount > 3 ? "s" : ""}. To add more, a one-time payment of $0.99 is required.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
