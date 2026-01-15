@@ -87,7 +87,7 @@ export function Layout({ children }: LayoutProps) {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2">
-              <img src={logo} alt="ZingerFi Logo" className="h-8 w-8 object-contain" />
+              <img src={logo} alt="ZingerFi Logo" className="h-16 w-16 object-contain" />
               <span className="text-xl font-bold text-foreground">ZingerFi</span>
             </Link>
 
