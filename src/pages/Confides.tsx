@@ -122,7 +122,7 @@ export default function Confides() {
       setConfideToDelete(null);
       loadConfides();
     } catch (error) {
-      toast.error("Failed to remove confide");
+      toast.error("Failed to remove confidee");
     } finally {
       setLoading(false);
     }
@@ -137,9 +137,9 @@ export default function Confides() {
               <Users className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold">Your Confides</h1>
+          <h1 className="text-3xl font-bold">Your Confidees</h1>
           <p className="text-muted-foreground">
-            Manage your trusted confide list and set aliases
+            Manage your trusted confidee list and set aliases
           </p>
           <Button 
             onClick={() => navigate("/send-request")} 
@@ -153,7 +153,7 @@ export default function Confides() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Confide List ({confides.length})</CardTitle>
+            <CardTitle>Confidee List ({confides.length})</CardTitle>
             <CardDescription>
               People you can exchange encrypted messages with
             </CardDescription>
@@ -162,7 +162,7 @@ export default function Confides() {
             {confides.length === 0 ? (
               <div className="text-center py-8">
                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No confides yet</p>
+                <p className="text-muted-foreground">No confidees yet</p>
                 <p className="text-sm text-muted-foreground mt-2">
                   Send a request to add someone to your list
                 </p>
@@ -251,10 +251,10 @@ export default function Confides() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove Confide?</AlertDialogTitle>
+            <AlertDialogTitle>Remove Confidee?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove <strong>{confideToDelete?.displayName}</strong> from your confide list? 
-              This will remove the confide relationship for both users and cannot be undone.
+              Are you sure you want to remove <strong>{confideToDelete?.displayName}</strong> from your confidee list? 
+              This will remove the confidee relationship for both users and cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
