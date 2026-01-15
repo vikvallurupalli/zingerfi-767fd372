@@ -322,7 +322,7 @@ export default function SendRequest() {
             <CardHeader>
               <CardTitle>Request Details</CardTitle>
               <CardDescription>
-                Enter the gmail address of the person you want to add
+                Enter the Gmail address of the registered person you want to add
               </CardDescription>
             </CardHeader>
             <CardContent>
