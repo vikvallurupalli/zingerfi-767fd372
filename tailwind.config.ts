@@ -67,6 +67,14 @@ export default {
           DEFAULT: "hsl(var(--email))",
           foreground: "hsl(var(--email-foreground))",
         },
+        outlook: {
+          DEFAULT: "hsl(var(--outlook))",
+          foreground: "hsl(var(--outlook-foreground))",
+        },
+        gmail: {
+          DEFAULT: "hsl(var(--gmail))",
+          foreground: "hsl(var(--gmail-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

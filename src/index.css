@@ -47,6 +47,10 @@ All colors MUST be HSL.
     --sms-foreground: 0 0% 100%;
     --email: 217 91% 60%;
     --email-foreground: 0 0% 100%;
+    --outlook: 199 100% 42%;
+    --outlook-foreground: 0 0% 100%;
+    --gmail: 4 90% 58%;
+    --gmail-foreground: 0 0% 100%;
 
     --radius: 0.5rem;
 
@@ -100,6 +104,10 @@ All colors MUST be HSL.
     --sms-foreground: 0 0% 100%;
     --email: 217 91% 60%;
     --email-foreground: 0 0% 100%;
+    --outlook: 199 100% 42%;
+    --outlook-foreground: 0 0% 100%;
+    --gmail: 4 90% 58%;
+    --gmail-foreground: 0 0% 100%;
 
     --sidebar-background: 210 52% 12%;
     --sidebar-foreground: 210 40% 98%;
