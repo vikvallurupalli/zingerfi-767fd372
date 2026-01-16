@@ -122,8 +122,9 @@ export function Layout({ children }: LayoutProps) {
               <span className="text-xs sm:text-sm text-muted-foreground hidden md:inline truncate max-w-32 lg:max-w-none">
                 {user?.email}
               </span>
-              <Button variant="outline" size="sm" onClick={signOut} className="h-8 sm:h-9 px-2 sm:px-3">
-                <LogOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <Button variant="outline" size="sm" onClick={signOut} className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                <LogOut className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Logout</span>
               </Button>
             </div>
           </div>
