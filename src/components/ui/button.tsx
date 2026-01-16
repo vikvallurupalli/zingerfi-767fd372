@@ -19,6 +19,8 @@ const buttonVariants = cva(
         telegram: "bg-telegram text-telegram-foreground hover:bg-telegram/90",
         sms: "bg-sms text-sms-foreground hover:bg-sms/90",
         email: "bg-email text-email-foreground hover:bg-email/90",
+        outlook: "bg-outlook text-outlook-foreground hover:bg-outlook/90",
+        gmail: "bg-gmail text-gmail-foreground hover:bg-gmail/90",
       },
       size: {
         default: "h-10 px-4 py-2",
