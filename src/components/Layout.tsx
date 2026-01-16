@@ -84,14 +84,14 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       <nav className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-2">
-              <img src={logo} alt="ZingerFi Logo" className="h-16 w-16 object-contain" />
-              <span className="text-xl font-bold text-foreground">ZingerFi</span>
+        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
+            <Link to="/" className="flex items-center space-x-2 shrink-0">
+              <img src={logo} alt="ZingerFi Logo" className="h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16 object-contain" />
+              <span className="text-lg sm:text-xl font-bold text-foreground">ZingerFi</span>
             </Link>
 
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center flex-wrap justify-center gap-0.5 sm:gap-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
@@ -100,14 +100,14 @@ export function Layout({ children }: LayoutProps) {
                     <Button
                       variant={isActive ? "default" : "ghost"}
                       size="sm"
-                      className="gap-2 relative"
+                      className="gap-1 sm:gap-2 relative px-2 sm:px-3 h-8 sm:h-9"
                     >
-                      <Icon className="h-4 w-4" />
-                      <span className="hidden md:inline">{item.label}</span>
+                      <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="hidden lg:inline">{item.label}</span>
                       {item.count !== undefined && item.count > 0 && (
                         <Badge 
                           variant="destructive" 
-                          className="ml-1 h-5 min-w-5 px-1 text-xs"
+                          className="ml-0.5 sm:ml-1 h-4 sm:h-5 min-w-4 sm:min-w-5 px-1 text-[10px] sm:text-xs"
                         >
                           {item.count}
                         </Badge>
@@ -118,12 +118,12 @@ export function Layout({ children }: LayoutProps) {
               })}
             </div>
 
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-muted-foreground hidden md:inline">
+            <div className="flex items-center space-x-2 shrink-0">
+              <span className="text-xs sm:text-sm text-muted-foreground hidden md:inline truncate max-w-32 lg:max-w-none">
                 {user?.email}
               </span>
-              <Button variant="outline" size="sm" onClick={signOut}>
-                <LogOut className="h-4 w-4" />
+              <Button variant="outline" size="sm" onClick={signOut} className="h-8 sm:h-9 px-2 sm:px-3">
+                <LogOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
             </div>
           </div>
