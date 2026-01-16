@@ -63,39 +63,41 @@ export default function Index() {
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">
       {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="ZingerFi Logo" className="h-24 w-24 rounded-xl object-contain" />
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              ZingerFi
-            </h1>
-          </div>
-          <div className="flex items-center gap-3">
-            {user ? (
-              <>
-                <span className="text-sm text-muted-foreground hidden md:inline px-3 py-1 bg-secondary rounded-full">
-                  {user.email}
-                </span>
-                <Button onClick={handleGetStarted} size="lg" className="shadow-md hover:shadow-lg transition-shadow">
-                  Go to Dashboard
-                </Button>
-                <Button variant="outline" onClick={signOut} className="gap-2">
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden md:inline">Logout</span>
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button onClick={handleRegister} size="lg" className="shadow-md hover:shadow-lg transition-shadow gap-2">
-                  <UserPlus className="h-4 w-4" />
-                  Register
-                </Button>
-                <Button variant="outline" onClick={handleLogin} size="lg" className="gap-2">
-                  <Lock className="h-4 w-4" />
-                  Login
-                </Button>
-              </>
-            )}
+        <div className="container mx-auto px-4 py-3 md:py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <img src={logo} alt="ZingerFi Logo" className="h-12 w-12 sm:h-16 md:h-24 sm:w-16 md:w-24 rounded-xl object-contain" />
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                ZingerFi
+              </h1>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
+              {user ? (
+                <>
+                  <span className="text-xs sm:text-sm text-muted-foreground hidden md:inline px-3 py-1 bg-secondary rounded-full">
+                    {user.email}
+                  </span>
+                  <Button onClick={handleGetStarted} size="sm" className="shadow-md hover:shadow-lg transition-shadow text-xs sm:text-sm">
+                    Dashboard
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={signOut} className="gap-1 sm:gap-2">
+                    <LogOut className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Logout</span>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button onClick={handleRegister} size="sm" className="shadow-md hover:shadow-lg transition-shadow gap-1 sm:gap-2 text-xs sm:text-sm">
+                    <UserPlus className="h-3 w-3 sm:h-4 sm:w-4" />
+                    Register
+                  </Button>
+                  <Button variant="outline" onClick={handleLogin} size="sm" className="gap-1 sm:gap-2 text-xs sm:text-sm">
+                    <Lock className="h-3 w-3 sm:h-4 sm:w-4" />
+                    Login
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>
