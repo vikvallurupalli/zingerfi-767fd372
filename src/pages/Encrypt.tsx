@@ -9,6 +9,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Lock, Copy, Trash2, MessageSquare, Send, Mic, MicOff } from "lucide-react";
 import { toast } from "sonner";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   encryptMessage,
   importPublicKey,
   importPrivateKey,
@@ -33,6 +40,8 @@ export default function Encrypt() {
   const [encryptedText, setEncryptedText] = useState("");
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [showSpeechErrorDialog, setShowSpeechErrorDialog] = useState(false);
+  const [speechErrorMessage, setSpeechErrorMessage] = useState("");
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
@@ -138,11 +147,36 @@ export default function Encrypt() {
     window.location.href = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent('Encrypted Message')}&body=${encodeURIComponent(link)}`;
   };
 
+  const showSpeechError = (errorType: string) => {
+    let message = "";
+    switch (errorType) {
+      case "not-allowed":
+        message = "Microphone access was denied.";
+        break;
+      case "no-speech":
+        message = "No speech was detected. Please try again.";
+        break;
+      case "audio-capture":
+        message = "No microphone was found or it's not working properly.";
+        break;
+      case "network":
+        message = "A network error occurred during speech recognition.";
+        break;
+      case "not-supported":
+        message = "Speech recognition is not supported in your browser.";
+        break;
+      default:
+        message = `Speech recognition error: ${errorType}`;
+    }
+    setSpeechErrorMessage(message);
+    setShowSpeechErrorDialog(true);
+  };
+
   const startListening = () => {
     const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     
     if (!SpeechRecognitionAPI) {
-      toast.error("Speech recognition is not supported in your browser");
+      showSpeechError("not-supported");
       return;
     }
 
@@ -177,11 +211,7 @@ export default function Encrypt() {
     recognition.onerror = (event) => {
       console.error('Speech recognition error:', event.error);
       setIsListening(false);
-      if (event.error === 'not-allowed') {
-        toast.error("Microphone access denied. Please allow microphone access.");
-      } else {
-        toast.error(`Speech recognition error: ${event.error}`);
-      }
+      showSpeechError(event.error);
     };
 
     recognition.onend = () => {
@@ -364,6 +394,33 @@ export default function Encrypt() {
             </CardContent>
           </Card>
         )}
+
+        <Dialog open={showSpeechErrorDialog} onOpenChange={setShowSpeechErrorDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-destructive">Speech Recognition Error</DialogTitle>
+              <DialogDescription className="space-y-4 pt-4">
+                <p>{speechErrorMessage}</p>
+                <div className="bg-muted p-4 rounded-lg space-y-2">
+                  <p className="font-semibold text-foreground">💡 Tip:</p>
+                  <p className="text-sm">
+                    Make sure speech recognition is enabled in your browser settings. 
+                    Go to <strong>Settings → Apps → [Your Browser]</strong> and ensure that 
+                    microphone access and speech recognition permissions are turned on.
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    For Chrome: Settings → Privacy and Security → Site Settings → Microphone
+                  </p>
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-end">
+              <Button onClick={() => setShowSpeechErrorDialog(false)}>
+                Got it
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
