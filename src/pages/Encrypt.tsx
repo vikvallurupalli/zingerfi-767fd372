@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Lock, Copy, Trash2, MessageSquare, Send } from "lucide-react";
+import { Lock, Copy, Trash2, MessageSquare, Send, Mic, MicOff } from "lucide-react";
 import { toast } from "sonner";
 import {
   encryptMessage,
@@ -32,6 +32,8 @@ export default function Encrypt() {
   const [message, setMessage] = useState("");
   const [encryptedText, setEncryptedText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     loadConfides();
@@ -136,6 +138,76 @@ export default function Encrypt() {
     window.location.href = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent('Encrypted Message')}&body=${encodeURIComponent(link)}`;
   };
 
+  const startListening = () => {
+    const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    
+    if (!SpeechRecognitionAPI) {
+      toast.error("Speech recognition is not supported in your browser");
+      return;
+    }
+
+    const recognition = new SpeechRecognitionAPI();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      toast.success("Listening... Speak now");
+    };
+
+    recognition.onresult = (event) => {
+      let finalTranscript = '';
+      let interimTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      if (finalTranscript) {
+        setMessage((prev) => prev + (prev ? ' ' : '') + finalTranscript);
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      setIsListening(false);
+      if (event.error === 'not-allowed') {
+        toast.error("Microphone access denied. Please allow microphone access.");
+      } else {
+        toast.error(`Speech recognition error: ${event.error}`);
+      }
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      toast.info("Stopped listening");
+    }
+  };
+
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
   return (
     <Layout>
       <div className="max-w-[42rem] mx-auto space-y-6">
@@ -206,13 +278,32 @@ export default function Encrypt() {
               <CardDescription>Enter the message you want to encrypt</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Textarea
-                placeholder="Enter your message here..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows={6}
-                className="resize-none text-base"
-              />
+              <div className="relative">
+                <Textarea
+                  placeholder="Enter your message here or click the microphone to speak..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  rows={6}
+                  className="resize-none text-base pr-12"
+                />
+                <Button
+                  type="button"
+                  variant={isListening ? "destructive" : "outline"}
+                  size="icon"
+                  onClick={toggleListening}
+                  className="absolute right-2 top-2 h-8 w-8"
+                  title={isListening ? "Stop listening" : "Start voice input"}
+                >
+                  {isListening ? (
+                    <MicOff className="h-4 w-4" />
+                  ) : (
+                    <Mic className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+              {isListening && (
+                <p className="text-sm text-primary animate-pulse">🎤 Listening... Speak now</p>
+              )}
               <div className="flex gap-2">
                 <Button
                   onClick={handleEncrypt}
