@@ -365,8 +365,8 @@ export default function Encrypt() {
                 <Send className="h-3 w-3" />
                 Telegram
               </Button>
-              <Button onClick={handleCopy} variant="secondary" size="sm" className="gap-1 text-xs">
-                <Copy className="h-3 w-3" />
+              <Button onClick={handleCopy} variant="secondary" size="sm" className="gap-1 text-xs h-auto py-2 whitespace-normal text-center">
+                <Copy className="h-3 w-3 flex-shrink-0" />
                 Copy to send it another way
               </Button>
             </div>
