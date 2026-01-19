@@ -316,29 +316,13 @@ export default function Encrypt() {
               <CardDescription>Enter the message you want to encrypt</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="relative">
-                <Textarea
-                  placeholder="Enter your message here or click the microphone to speak..."
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  rows={6}
-                  className="resize-none text-base pr-12"
-                />
-                <Button
-                  type="button"
-                  variant={isListening ? "destructive" : "outline"}
-                  size="icon"
-                  onClick={toggleListening}
-                  className="absolute right-2 top-2 h-8 w-8"
-                  title={isListening ? "Stop listening" : "Start voice input"}
-                >
-                  {isListening ? (
-                    <MicOff className="h-4 w-4" />
-                  ) : (
-                    <Mic className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
+              <Textarea
+                placeholder="Enter your message here..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                rows={6}
+                className="resize-none text-base"
+              />
               {isListening && (
                 <p className="text-sm text-primary animate-pulse">🎤 Listening... Speak now</p>
               )}
