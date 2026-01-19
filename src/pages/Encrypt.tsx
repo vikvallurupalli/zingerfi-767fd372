@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { usePWADetection } from "@/hooks/use-pwa-detection";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,9 @@ export default function Encrypt() {
   const [isListening, setIsListening] = useState(false);
   const [showSpeechErrorDialog, setShowSpeechErrorDialog] = useState(false);
   const [speechErrorMessage, setSpeechErrorMessage] = useState("");
+  const [showPWAWarningDialog, setShowPWAWarningDialog] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const { isPWA } = usePWADetection();
 
   useEffect(() => {
     loadConfides();
@@ -231,6 +234,11 @@ export default function Encrypt() {
   };
 
   const toggleListening = () => {
+    if (isPWA) {
+      setShowPWAWarningDialog(true);
+      return;
+    }
+    
     if (isListening) {
       stopListening();
     } else {
@@ -404,6 +412,29 @@ export default function Encrypt() {
             </DialogHeader>
             <div className="flex justify-end">
               <Button onClick={() => setShowSpeechErrorDialog(false)}>
+                Got it
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showPWAWarningDialog} onOpenChange={setShowPWAWarningDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-primary">Browser Required</DialogTitle>
+              <DialogDescription className="space-y-4 pt-4">
+                <p>Speech recognition requires a browser and cannot be used in app mode.</p>
+                <div className="bg-muted p-4 rounded-lg space-y-2">
+                  <p className="font-semibold text-foreground">💡 Tip:</p>
+                  <p className="text-sm">
+                    To use the voice input feature, please open this page in your web browser 
+                    (Safari, Chrome, etc.) instead of the installed app.
+                  </p>
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-end">
+              <Button onClick={() => setShowPWAWarningDialog(false)}>
                 Got it
               </Button>
             </div>
