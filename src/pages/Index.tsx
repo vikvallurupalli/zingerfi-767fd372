@@ -220,9 +220,15 @@ export default function Index() {
       <footer className="border-t py-8 bg-card/50">
         <div className="container mx-auto px-4 text-center text-muted-foreground space-y-2">
           <p>&copy; 2025 ZingerFi. Secure encryption for everyone.</p>
-          <Link to="/privacy-policy" className="text-sm hover:text-primary transition-colors underline">
-            Privacy Policy
-          </Link>
+          <div className="flex items-center justify-center gap-4">
+            <Link to="/privacy-policy" className="text-sm hover:text-primary transition-colors underline">
+              Privacy Policy
+            </Link>
+            <span className="text-muted-foreground/50">|</span>
+            <Link to="/terms-of-service" className="text-sm hover:text-primary transition-colors underline">
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </footer>
 
