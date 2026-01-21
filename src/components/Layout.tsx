@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Lock,
@@ -13,6 +14,7 @@ import {
   Clock,
   LogOut,
   Shield,
+  Settings,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 
@@ -22,6 +24,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const { signOut, user } = useAuth();
+  const { isSuperAdmin } = useUserRole();
   const location = useLocation();
   const [incomingCount, setIncomingCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
@@ -119,6 +122,18 @@ export function Layout({ children }: LayoutProps) {
             </div>
 
             <div className="flex items-center space-x-2 shrink-0">
+              {isSuperAdmin && (
+                <Link to="/admin">
+                  <Button
+                    variant={location.pathname.startsWith("/admin") ? "default" : "outline"}
+                    size="sm"
+                    className="gap-1 sm:gap-2 text-xs sm:text-sm"
+                  >
+                    <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Admin</span>
+                  </Button>
+                </Link>
+              )}
               <span className="text-xs sm:text-sm text-muted-foreground hidden md:inline truncate max-w-32 lg:max-w-none">
                 {user?.email}
               </span>
