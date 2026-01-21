@@ -82,7 +82,7 @@ export function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <nav className="border-b border-border bg-card">
         <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
@@ -131,7 +131,16 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </nav>
 
-      <main className="container mx-auto px-4 py-8">{children}</main>
+      <main className="container mx-auto px-4 py-8 flex-1">{children}</main>
+
+      <footer className="border-t border-border bg-card mt-auto">
+        <div className="container mx-auto px-4 py-4 text-center text-muted-foreground space-y-1">
+          <p className="text-sm">&copy; 2025 ZingerFi. All rights reserved.</p>
+          <Link to="/privacy-policy" className="text-sm hover:text-primary transition-colors underline">
+            Privacy Policy
+          </Link>
+        </div>
+      </footer>
     </div>
   );
 }
