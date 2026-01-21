@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -218,8 +218,11 @@ export default function Index() {
 
       {/* Footer */}
       <footer className="border-t py-8 bg-card/50">
-        <div className="container mx-auto px-4 text-center text-muted-foreground">
+        <div className="container mx-auto px-4 text-center text-muted-foreground space-y-2">
           <p>&copy; 2025 ZingerFi. Secure encryption for everyone.</p>
+          <Link to="/privacy-policy" className="text-sm hover:text-primary transition-colors underline">
+            Privacy Policy
+          </Link>
         </div>
       </footer>
 

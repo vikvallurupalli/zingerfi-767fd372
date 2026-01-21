@@ -13,6 +13,7 @@ import Confides from "./pages/Confides";
 import SendRequest from "./pages/SendRequest";
 import PendingRequests from "./pages/PendingRequests";
 import IncomingRequests from "./pages/IncomingRequests";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -101,6 +102,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
