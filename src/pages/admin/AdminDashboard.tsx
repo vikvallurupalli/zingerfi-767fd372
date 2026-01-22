@@ -15,7 +15,6 @@ const adminFunctions = [
     description: "Manage user roles and permissions",
     icon: Shield,
     path: "/admin/roles",
-    comingSoon: true,
   },
   {
     title: "Analytics",
