@@ -213,8 +213,8 @@ export default function Decrypt() {
           </CardContent>
         </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-items-center">
-          <Card className="scale-[0.6] origin-top w-[166.67%]">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4 justify-items-center">
+          <Card className="w-full md:scale-[0.6] md:origin-top md:w-[166.67%]">
             <CardHeader>
               <CardTitle className="text-xl">Encrypted Message</CardTitle>
               <CardDescription className="text-base">Paste the encrypted text here</CardDescription>
@@ -244,7 +244,7 @@ export default function Decrypt() {
             </CardContent>
           </Card>
 
-          <Card className={`scale-[0.6] origin-top w-[166.67%] border-success/50 ${!decryptedMessage ? 'opacity-50' : ''}`}>
+          <Card className={`w-full md:scale-[0.6] md:origin-top md:w-[166.67%] border-success/50 ${!decryptedMessage ? 'opacity-50' : ''}`}>
             <CardHeader>
               <CardTitle className="text-xl">Decrypted Message</CardTitle>
               <CardDescription className="text-base">Your decrypted message is ready</CardDescription>
