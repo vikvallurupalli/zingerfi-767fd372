@@ -18,6 +18,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import CustomerSearch from "./pages/admin/CustomerSearch";
+import UserRoles from "./pages/admin/UserRoles";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -143,6 +144,14 @@ const App = () => (
               element={
                 <AdminRoute>
                   <CustomerSearch />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/roles"
+              element={
+                <AdminRoute>
+                  <UserRoles />
                 </AdminRoute>
               }
             />
