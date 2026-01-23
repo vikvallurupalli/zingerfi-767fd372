@@ -213,59 +213,42 @@ export default function Decrypt() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4 justify-items-center">
-          <Card className="w-full md:scale-[0.6] md:origin-top md:w-[166.67%]">
-            <CardHeader>
-              <CardTitle className="text-xl">Encrypted Message</CardTitle>
-              <CardDescription className="text-base">Paste the encrypted text here</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Textarea
-                placeholder="Paste encrypted text here..."
-                value={encryptedText}
-                onChange={(e) => setEncryptedText(e.target.value)}
-                rows={8}
-                className="resize-none font-mono-encrypted text-base break-all text-foreground"
-              />
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleDecrypt}
-                  disabled={loading || !encryptedText || !senderEmail}
-                  className="gap-2 h-12 px-6 text-lg"
-                >
-                  <Unlock className="h-5 w-5" />
-                  Decrypt
-                </Button>
-                <Button variant="outline" onClick={handleClear} className="gap-2 h-12 px-6 text-lg">
-                  <Trash2 className="h-5 w-5" />
-                  Clear
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        {encryptedText && (
+          <div className="flex justify-center gap-2 mb-4">
+            <Button
+              onClick={handleDecrypt}
+              disabled={loading || !encryptedText || !senderEmail}
+              className="gap-2 h-12 px-6 text-lg"
+            >
+              <Unlock className="h-5 w-5" />
+              Decrypt
+            </Button>
+            <Button variant="outline" onClick={handleClear} className="gap-2 h-12 px-6 text-lg">
+              <Trash2 className="h-5 w-5" />
+              Clear
+            </Button>
+          </div>
+        )}
 
-          <Card className={`w-full md:scale-[0.6] md:origin-top md:w-[166.67%] border-success/50 ${!decryptedMessage ? 'opacity-50' : ''}`}>
-            <CardHeader>
-              <CardTitle className="text-xl">Decrypted Message</CardTitle>
-              <CardDescription className="text-base">Your decrypted message is ready</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="relative">
-                <Textarea
-                  value={decryptedMessage}
-                  readOnly
-                  rows={8}
-                  placeholder="Decrypted message will appear here..."
-                  className="resize-none text-lg font-medium text-foreground"
-                />
-              </div>
-              <Button onClick={handleCopy} disabled={!decryptedMessage} className="w-full gap-2 h-12 text-lg">
-                <Copy className="h-5 w-5" />
-                Copy to Clipboard
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+        <Card className={`max-w-[25rem] mx-auto border-success/50 ${!decryptedMessage ? 'opacity-50' : ''}`}>
+          <CardHeader className="py-3 px-4">
+            <CardTitle className="text-base">Decrypted Message</CardTitle>
+            <CardDescription className="text-xs">Your decrypted message will appear here</CardDescription>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 space-y-4">
+            <Textarea
+              value={decryptedMessage}
+              readOnly
+              rows={6}
+              placeholder="Decrypted message will appear here..."
+              className="resize-none text-sm font-medium text-foreground"
+            />
+            <Button onClick={handleCopy} disabled={!decryptedMessage} className="w-full gap-2">
+              <Copy className="h-4 w-4" />
+              Copy to Clipboard
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
       <AlertDialog open={showWarningModal} onOpenChange={setShowWarningModal}>

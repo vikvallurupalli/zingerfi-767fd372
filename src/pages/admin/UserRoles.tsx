@@ -30,13 +30,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Search, ArrowLeft, Shield, UserPlus, Trash2, CreditCard } from "lucide-react";
+import { Search, ArrowLeft, Shield, UserPlus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Database } from "@/integrations/supabase/types";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
-type PaymentFilter = "all" | "paid" | "not_paid";
 
 interface UserWithRole {
   id: string;
@@ -44,7 +43,6 @@ interface UserWithRole {
   created_at: string;
   role: AppRole | null;
   role_id: string | null;
-  hasPaid: boolean;
 }
 
 const ROLES: { value: AppRole; label: string }[] = [
@@ -55,7 +53,6 @@ const ROLES: { value: AppRole; label: string }[] = [
 
 export default function UserRoles() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<AppRole>("user");
@@ -63,9 +60,8 @@ export default function UserRoles() {
   const pageSize = 10;
 
   const { data, isLoading } = useQuery({
-    queryKey: ["users-with-roles", searchQuery, paymentFilter, currentPage],
+    queryKey: ["users-with-roles", searchQuery, currentPage],
     queryFn: async () => {
-      // First get all profiles (we'll filter after joining with payments)
       let profilesQuery = supabase
         .from("profiles")
         .select("id, email, created_at");
@@ -86,17 +82,8 @@ export default function UserRoles() {
 
       if (rolesError) throw rolesError;
 
-      // Get all payment records
-      const { data: payments, error: paymentsError } = await supabase
-        .from("confide_unlocks")
-        .select("user_id");
-
-      if (paymentsError) throw paymentsError;
-
-      const paidUserIds = new Set(payments?.map((p) => p.user_id) || []);
-
-      // Map roles and payment status to users
-      let usersWithRoles: UserWithRole[] = (profiles || []).map((profile) => {
+      // Map roles to users
+      const usersWithRoles: UserWithRole[] = (profiles || []).map((profile) => {
         const userRole = roles?.find((r) => r.user_id === profile.id);
         return {
           id: profile.id,
@@ -104,16 +91,8 @@ export default function UserRoles() {
           created_at: profile.created_at,
           role: userRole?.role || null,
           role_id: userRole?.id || null,
-          hasPaid: paidUserIds.has(profile.id),
         };
       });
-
-      // Apply payment filter
-      if (paymentFilter === "paid") {
-        usersWithRoles = usersWithRoles.filter((u) => u.hasPaid);
-      } else if (paymentFilter === "not_paid") {
-        usersWithRoles = usersWithRoles.filter((u) => !u.hasPaid);
-      }
 
       const total = usersWithRoles.length;
 
@@ -224,22 +203,6 @@ export default function UserRoles() {
               className="pl-10"
             />
           </div>
-          <Select
-            value={paymentFilter}
-            onValueChange={(value) => {
-              setPaymentFilter(value as PaymentFilter);
-              setCurrentPage(1);
-            }}
-          >
-            <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Payment Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Users</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="not_paid">Not Paid</SelectItem>
-            </SelectContent>
-          </Select>
           <Button type="submit">Search</Button>
         </form>
 
@@ -249,7 +212,6 @@ export default function UserRoles() {
               <TableRow>
                 <TableHead>Email</TableHead>
                 <TableHead>Current Role</TableHead>
-                <TableHead>Payment</TableHead>
                 <TableHead>Joined</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -257,13 +219,13 @@ export default function UserRoles() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
+                  <TableCell colSpan={4} className="text-center py-8">
                     Loading users...
                   </TableCell>
                 </TableRow>
               ) : data?.users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
+                  <TableCell colSpan={4} className="text-center py-8">
                     No users found
                   </TableCell>
                 </TableRow>
@@ -281,18 +243,6 @@ export default function UserRoles() {
                         {user.role
                           ? ROLES.find((r) => r.value === user.role)?.label
                           : "No Role"}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                          user.hasPaid
-                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        <CreditCard className="h-3 w-3" />
-                        {user.hasPaid ? "Paid" : "Not Paid"}
                       </span>
                     </TableCell>
                     <TableCell>

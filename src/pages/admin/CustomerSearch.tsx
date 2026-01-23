@@ -12,6 +12,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Pagination,
   PaginationContent,
   PaginationItem,
@@ -20,14 +27,17 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ArrowLeft, Loader2 } from "lucide-react";
+import { Search, ArrowLeft, Loader2, CreditCard } from "lucide-react";
 import { format } from "date-fns";
+
+type PaymentFilter = "all" | "paid" | "not_paid";
 
 interface UserProfile {
   id: string;
   email: string;
   created_at: string;
   public_key: string;
+  hasPaid: boolean;
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -36,6 +46,7 @@ export default function CustomerSearch() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
@@ -43,39 +54,65 @@ export default function CustomerSearch() {
 
   useEffect(() => {
     fetchUsers();
-  }, [currentPage, searchQuery]);
+  }, [currentPage, searchQuery, paymentFilter]);
 
   const fetchUsers = async () => {
     setLoading(true);
-    
-    const from = (currentPage - 1) * ITEMS_PER_PAGE;
-    const to = from + ITEMS_PER_PAGE - 1;
 
-    let query = supabase
+    // Fetch all profiles first
+    let profilesQuery = supabase
       .from("profiles")
-      .select("id, email, created_at, public_key", { count: "exact" });
+      .select("id, email, created_at, public_key");
 
     if (searchQuery.trim()) {
-      query = query.ilike("email", `%${searchQuery.trim()}%`);
+      profilesQuery = profilesQuery.ilike("email", `%${searchQuery.trim()}%`);
     }
 
-    const { data, count, error } = await query
-      .order("created_at", { ascending: false })
-      .range(from, to);
+    const { data: profiles, error: profilesError } = await profilesQuery
+      .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Error fetching users:", error);
-    } else {
-      setUsers(data || []);
-      setTotalCount(count || 0);
+    if (profilesError) {
+      console.error("Error fetching users:", profilesError);
+      setLoading(false);
+      return;
     }
+
+    // Fetch payment records
+    const { data: payments, error: paymentsError } = await supabase
+      .from("confide_unlocks")
+      .select("user_id");
+
+    if (paymentsError) {
+      console.error("Error fetching payments:", paymentsError);
+    }
+
+    const paidUserIds = new Set(payments?.map((p) => p.user_id) || []);
+
+    // Map payment status to users
+    let usersWithPayment: UserProfile[] = (profiles || []).map((profile) => ({
+      ...profile,
+      hasPaid: paidUserIds.has(profile.id),
+    }));
+
+    // Apply payment filter
+    if (paymentFilter === "paid") {
+      usersWithPayment = usersWithPayment.filter((u) => u.hasPaid);
+    } else if (paymentFilter === "not_paid") {
+      usersWithPayment = usersWithPayment.filter((u) => !u.hasPaid);
+    }
+
+    // Apply pagination
+    const from = (currentPage - 1) * ITEMS_PER_PAGE;
+    const paginatedUsers = usersWithPayment.slice(from, from + ITEMS_PER_PAGE);
+
+    setUsers(paginatedUsers);
+    setTotalCount(usersWithPayment.length);
     setLoading(false);
   };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchUsers();
   };
 
   const handlePageChange = (page: number) => {
@@ -119,8 +156,8 @@ export default function CustomerSearch() {
           </div>
         </div>
 
-        <form onSubmit={handleSearch} className="flex gap-2 max-w-md">
-          <div className="relative flex-1">
+        <form onSubmit={handleSearch} className="flex gap-2 flex-wrap">
+          <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search by email..."
@@ -129,6 +166,22 @@ export default function CustomerSearch() {
               className="pl-10"
             />
           </div>
+          <Select
+            value={paymentFilter}
+            onValueChange={(value) => {
+              setPaymentFilter(value as PaymentFilter);
+              setCurrentPage(1);
+            }}
+          >
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Payment Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Users</SelectItem>
+              <SelectItem value="paid">Paid</SelectItem>
+              <SelectItem value="not_paid">Not Paid</SelectItem>
+            </SelectContent>
+          </Select>
           <Button type="submit">Search</Button>
         </form>
 
@@ -138,6 +191,7 @@ export default function CustomerSearch() {
               <TableRow>
                 <TableHead>Email</TableHead>
                 <TableHead>Joined</TableHead>
+                <TableHead>Payment</TableHead>
                 <TableHead>Has Keys</TableHead>
                 <TableHead>User ID</TableHead>
               </TableRow>
@@ -145,13 +199,13 @@ export default function CustomerSearch() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8">
+                  <TableCell colSpan={5} className="text-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                   </TableCell>
                 </TableRow>
               ) : users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                     No users found
                   </TableCell>
                 </TableRow>
@@ -161,6 +215,18 @@ export default function CustomerSearch() {
                     <TableCell className="font-medium">{user.email}</TableCell>
                     <TableCell>
                       {format(new Date(user.created_at), "MMM d, yyyy")}
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                          user.hasPaid
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        <CreditCard className="h-3 w-3" />
+                        {user.hasPaid ? "Paid" : "Not Paid"}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <span
