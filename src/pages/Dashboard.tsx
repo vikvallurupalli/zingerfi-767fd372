@@ -15,15 +15,18 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { AddToHomeScreenPopup } from "@/components/AddToHomeScreenPopup";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [showAddToHomeScreen, setShowAddToHomeScreen] = useState(false);
   const [welcomeMessage, setWelcomeMessage] = useState("");
 
   useEffect(() => {
     const checkAuthMode = async () => {
       const authMode = sessionStorage.getItem('authMode');
+      const hasSeenAddToHomeScreen = localStorage.getItem('hasSeenAddToHomeScreen');
       
       // Only show popup if coming from Register button
       if (authMode === 'register' && user) {
@@ -47,15 +50,35 @@ export default function Dashboard() {
             setWelcomeMessage("You are an already registered user. Enjoy encrypting.");
           }
           setShowWelcomeModal(true);
+          
+          // Show add to home screen after welcome modal if not seen before
+          if (!hasSeenAddToHomeScreen) {
+            localStorage.setItem('hasSeenAddToHomeScreen', 'true');
+          }
         }
+      } else if (authMode === 'login' && user && !hasSeenAddToHomeScreen) {
+        // For first login (not register), show add to home screen popup directly
+        sessionStorage.removeItem('authMode');
+        setShowAddToHomeScreen(true);
+        localStorage.setItem('hasSeenAddToHomeScreen', 'true');
       } else if (authMode) {
-        // Clean up authMode for login (no popup shown)
+        // Clean up authMode for other cases
         sessionStorage.removeItem('authMode');
       }
     };
 
     checkAuthMode();
   }, [user]);
+
+  // Handle welcome modal close - show add to home screen popup after
+  const handleWelcomeModalClose = () => {
+    setShowWelcomeModal(false);
+    const hasSeenAddToHomeScreen = localStorage.getItem('hasSeenAddToHomeScreen');
+    if (hasSeenAddToHomeScreen === 'true') {
+      // We just set it, so show the popup now
+      setShowAddToHomeScreen(true);
+    }
+  };
 
   return (
     <>
@@ -68,12 +91,17 @@ export default function Dashboard() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setShowWelcomeModal(false)}>
+            <AlertDialogAction onClick={handleWelcomeModalClose}>
               OK
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      <AddToHomeScreenPopup 
+        open={showAddToHomeScreen} 
+        onOpenChange={setShowAddToHomeScreen} 
+      />
     <Layout>
       <div className="space-y-8">
         <div className="text-center space-y-2">
