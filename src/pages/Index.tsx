@@ -88,8 +88,6 @@ export default function Index() {
                 </>
               ) : (
                 <>
->
-
                   <Button onClick={handleRegister} size="sm" className="shadow-md hover:shadow-lg transition-shadow gap-1 sm:gap-2 text-xs sm:text-sm">
                     <UserPlus className="h-3 w-3 sm:h-4 sm:w-4" />
                     Register
@@ -136,42 +134,44 @@ export default function Index() {
               </Carousel>
             </div>
 
-            {/* Buttons */}
-            {user ? (
-              <Button onClick={handleGetStarted} className="gap-2 shadow-md">
-                <Lock className="h-4 w-4" />
-                Go to Dashboard
-              </Button>
-            ) : (
-              <>
-                <Button onClick={handleRegister} className="gap-2 shadow-md">
-                  <UserPlus className="h-4 w-4" />
-                  Register
-                </Button>
-                <Button variant="outline" onClick={handleLogin} className="gap-2">
-                  <Lock className="h-4 w-4" />
-                  Login
-                </Button>
-              </>
-            )}
-            <Button variant="secondary" onClick={() => setShowHowToUse(true)} className="gap-2">
-              <Share2 className="h-4 w-4" />
-              View Guide
-            </Button>
-            <Button variant="secondary" onClick={() => setShowInstallIOS(true)} className="gap-2">
-              <Smartphone className="h-4 w-4" />
-              Phone App Instructions
-            </Button>
-          </div>
+            {/* Tagline */}
+            <div className="w-full md:w-auto text-center md:text-left">
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight mb-2 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+                Send messages only your recipient can read.
+              </h2>
+              <p className="text-sm md:text-base text-muted-foreground">
+                Cracking this with classical computers would take <span className="font-bold text-primary">billions of years</span>
+              </p>
+            </div>
 
-          {/* Main Hero Content */}
-          <div className="text-center mb-8">
-            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight mb-4 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-              Send messages only your recipient can read.
-            </h2>
-            <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
-              Cracking this with classical computers would take <span className="font-bold text-primary">billions of years</span>
-            </p>
+            {/* Buttons */}
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 w-full md:w-auto">
+              {user ? (
+                <Button onClick={handleGetStarted} className="gap-2 shadow-md">
+                  <Lock className="h-4 w-4" />
+                  Go to Dashboard
+                </Button>
+              ) : (
+                <>
+                  <Button onClick={handleRegister} className="gap-2 shadow-md">
+                    <UserPlus className="h-4 w-4" />
+                    Register
+                  </Button>
+                  <Button variant="outline" onClick={handleLogin} className="gap-2">
+                    <Lock className="h-4 w-4" />
+                    Login
+                  </Button>
+                </>
+              )}
+              <Button variant="secondary" onClick={() => setShowHowToUse(true)} className="gap-2">
+                <Share2 className="h-4 w-4" />
+                View Guide
+              </Button>
+              <Button variant="secondary" onClick={() => setShowInstallIOS(true)} className="gap-2">
+                <Smartphone className="h-4 w-4" />
+                Phone App Instructions
+              </Button>
+            </div>
           </div>
         </div>
       </section>
