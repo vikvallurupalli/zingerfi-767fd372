@@ -72,6 +72,14 @@ export default function Index() {
                 ZingerFi
               </h1>
             </div>
+          <div className="text-center mb-8">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight mb-4 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+              Send messages only your recipient can read.
+            </h2>
+            <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
+              Cracking this with classical computers would take <span className="font-bold text-primary">billions of years</span>
+            </p>
+          </div>
             <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
               {user ? (
                 <>
