@@ -1,21 +1,24 @@
 import { useState, useEffect } from "react";
-import { Shield, Eye, Clock } from "lucide-react";
+import { Shield, EyeOff, Timer } from "lucide-react";
 
 const features = [
   {
     title: "Military-grade encryption",
     description: "Your messages are unreadable to anyone except your recipient",
     icon: Shield,
+    iconColor: "text-emerald-500",
   },
   {
     title: "No middleman",
     description: "We can't read your messages. True privacy.",
-    icon: Eye,
+    icon: EyeOff,
+    iconColor: "text-blue-500",
   },
   {
     title: "One time read",
     description: "Encrypted message gets invalidated after first read.",
-    icon: Clock,
+    icon: Timer,
+    iconColor: "text-amber-500",
   },
 ];
 
@@ -45,7 +48,7 @@ export function RotatingFeatureCard() {
           isAnimating ? "opacity-0 translate-y-1" : "opacity-100 translate-y-0"
         }`}
       >
-        <Icon className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+        <Icon className={`h-4 w-4 ${currentFeature.iconColor} mt-0.5 flex-shrink-0`} />
         <div>
           <p className="text-xs font-semibold text-primary">{currentFeature.title}</p>
           <p className="text-xs text-muted-foreground leading-tight line-clamp-2">{currentFeature.description}</p>
