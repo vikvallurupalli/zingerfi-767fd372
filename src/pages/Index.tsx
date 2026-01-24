@@ -88,12 +88,7 @@ export default function Index() {
                 </>
               ) : (
                 <>
-                  <h2 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight mb-4 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-              Send messages only your recipient can read.
-            </h2>
-            <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
-              Cracking this with classical computers would take <span className="font-bold text-primary">billions of years</span>
-            </p>
+>
 
                   <Button onClick={handleRegister} size="sm" className="shadow-md hover:shadow-lg transition-shadow gap-1 sm:gap-2 text-xs sm:text-sm">
                     <UserPlus className="h-3 w-3 sm:h-4 sm:w-4" />
