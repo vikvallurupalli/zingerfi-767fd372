@@ -104,8 +104,19 @@ export default function Index() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-4xl mx-auto">
-          {/* Action Buttons Row */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+          {/* Action Buttons Row with iPhone */}
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
+            {/* iPhone Image - Left Side */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 blur-2xl rounded-full opacity-50"></div>
+              <img 
+                src={iphoneImage} 
+                alt="iPhone showing encrypted message" 
+                className="relative w-20 h-auto shadow-xl rounded-xl"
+              />
+            </div>
+
+            {/* Buttons */}
             {user ? (
               <Button onClick={handleGetStarted} className="gap-2 shadow-md">
                 <Lock className="h-4 w-4" />
@@ -141,18 +152,6 @@ export default function Index() {
             <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
               Cracking this with classical computers would take <span className="font-bold text-primary">billions of years</span>
             </p>
-          </div>
-
-          {/* iPhone Mockup */}
-          <div className="flex justify-center">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 blur-3xl rounded-full opacity-50"></div>
-              <img 
-                src={iphoneImage} 
-                alt="iPhone showing encrypted message" 
-                className="relative w-full max-w-xs h-auto shadow-2xl rounded-3xl"
-              />
-            </div>
           </div>
         </div>
       </section>
