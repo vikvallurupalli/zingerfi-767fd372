@@ -6,6 +6,7 @@ import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carouse
 import Autoplay from "embla-carousel-autoplay";
 import { Lock, Users, Smartphone, Share2, UserPlus, Mail, Key, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { RotatingFeatureCard } from "@/components/RotatingFeatureCard";
 import sendImage from "@/assets/send.jpg";
 import smsImage from "@/assets/sms.jpg";
 import logo from "@/assets/logo.png";
@@ -136,6 +137,9 @@ export default function Index() {
 
             {/* Right Side - Tagline + Buttons */}
             <div className="flex flex-col items-center md:items-start justify-center text-center md:text-left">
+              {/* Rotating Feature Card */}
+              <RotatingFeatureCard />
+
               {/* Tagline */}
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight mb-2 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
                 Send messages only your recipient can read.
