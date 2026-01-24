@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 import { Lock, Users, Smartphone, Share2, UserPlus, Mail, Key, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import iphoneImage from "@/assets/iphoneImage.png";
 import sendImage from "@/assets/send.jpg";
+import smsImage from "@/assets/sms.jpg";
 import logo from "@/assets/logo.png";
 export default function Index() {
   const navigate = useNavigate();
@@ -109,25 +110,27 @@ export default function Index() {
           <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
             {/* Image Carousel - Left Side */}
             <div className="relative w-32">
-              <Carousel opts={{ loop: true }} className="w-full">
+              <Carousel 
+                opts={{ loop: true }} 
+                plugins={[Autoplay({ delay: 3000, stopOnInteraction: false })]}
+                className="w-full"
+              >
                 <CarouselContent>
                   <CarouselItem>
                     <img 
-                      src={iphoneImage} 
-                      alt="iPhone showing encrypted message" 
+                      src={sendImage} 
+                      alt="Encrypt message screen" 
                       className="w-full h-auto shadow-xl rounded-xl"
                     />
                   </CarouselItem>
                   <CarouselItem>
                     <img 
-                      src={sendImage} 
-                      alt="Send encrypted message" 
+                      src={smsImage} 
+                      alt="Send encrypted message via SMS" 
                       className="w-full h-auto shadow-xl rounded-xl"
                     />
                   </CarouselItem>
                 </CarouselContent>
-                <CarouselPrevious className="left-0 h-6 w-6" />
-                <CarouselNext className="right-0 h-6 w-6" />
               </Carousel>
             </div>
 
