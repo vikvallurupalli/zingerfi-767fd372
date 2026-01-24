@@ -107,9 +107,9 @@ export default function Index() {
       <section className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-4xl mx-auto">
           {/* Action Buttons Row with iPhone */}
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 md:gap-8 mb-8">
             {/* Image Carousel - Left Side */}
-            <div className="relative w-32">
+            <div className="relative w-32 md:w-48 lg:w-56 flex-shrink-0">
               <Carousel 
                 opts={{ loop: true }} 
                 plugins={[Autoplay({ delay: 3000, stopOnInteraction: false })]}
