@@ -112,7 +112,7 @@ export default function Index() {
               <img 
                 src={iphoneImage} 
                 alt="iPhone showing encrypted message" 
-                className="relative w-20 h-auto shadow-xl rounded-xl"
+                className="relative w-48 h-auto shadow-xl rounded-xl"
               />
             </div>
 
