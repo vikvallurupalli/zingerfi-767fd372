@@ -214,6 +214,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      unregister_user: { Args: { target_user_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "superadmin" | "admin" | "user"

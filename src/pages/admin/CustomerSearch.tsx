@@ -26,9 +26,20 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, ArrowLeft, Loader2, CreditCard } from "lucide-react";
+import { Search, ArrowLeft, Loader2, CreditCard, UserX } from "lucide-react";
 import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 type PaymentFilter = "all" | "paid" | "not_paid";
 
@@ -49,6 +60,9 @@ export default function CustomerSearch() {
   const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [unregisteringUser, setUnregisteringUser] = useState<UserProfile | null>(null);
+  const [isUnregistering, setIsUnregistering] = useState(false);
+  const { toast } = useToast();
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
@@ -139,6 +153,42 @@ export default function CustomerSearch() {
     return pages;
   };
 
+  const handleUnregister = async () => {
+    if (!unregisteringUser) return;
+    
+    setIsUnregistering(true);
+    try {
+      const { error } = await supabase.rpc("unregister_user", {
+        target_user_id: unregisteringUser.id,
+      });
+
+      if (error) {
+        console.error("Error unregistering user:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to unregister user",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "User Unregistered",
+          description: `${unregisteringUser.email} has been successfully unregistered.`,
+        });
+        fetchUsers();
+      }
+    } catch (err) {
+      console.error("Unregister exception:", err);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUnregistering(false);
+      setUnregisteringUser(null);
+    }
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -194,18 +244,19 @@ export default function CustomerSearch() {
                 <TableHead>Payment</TableHead>
                 <TableHead>Has Keys</TableHead>
                 <TableHead>User ID</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
+                  <TableCell colSpan={6} className="text-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                   </TableCell>
                 </TableRow>
               ) : users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                     No users found
                   </TableCell>
                 </TableRow>
@@ -241,6 +292,16 @@ export default function CustomerSearch() {
                     </TableCell>
                     <TableCell className="font-mono text-xs text-muted-foreground">
                       {user.id.slice(0, 8)}...
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setUnregisteringUser(user)}
+                      >
+                        <UserX className="h-4 w-4 mr-1" />
+                        Unregister
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))
@@ -281,6 +342,45 @@ export default function CustomerSearch() {
           </Pagination>
         )}
       </div>
+
+      <AlertDialog open={!!unregisteringUser} onOpenChange={(open) => !open && setUnregisteringUser(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unregister User</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to unregister <strong>{unregisteringUser?.email}</strong>?
+              <br /><br />
+              This will permanently delete:
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>User profile and account</li>
+                <li>All confides and confide requests</li>
+                <li>Payment records</li>
+                <li>Decrypted message history</li>
+                <li>All roles and permissions</li>
+              </ul>
+              <br />
+              <strong className="text-destructive">This action cannot be undone.</strong>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isUnregistering}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleUnregister}
+              disabled={isUnregistering}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isUnregistering ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Unregistering...
+                </>
+              ) : (
+                "Unregister"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Layout>
   );
 }
