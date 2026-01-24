@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Lock, Users, Smartphone, Share2, UserPlus, Mail, Key, LogOut, Sparkles } from "lucide-react";
+import { Lock, Users, Smartphone, Share2, UserPlus, Mail, Key, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import iphoneImage from "@/assets/iphoneImage.png";
 import logo from "@/assets/logo.png";
@@ -103,102 +102,45 @@ export default function Index() {
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
-        <div className="max-w-6xl mx-auto">
-          {/* Secret Caption */}
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <Sparkles className="h-6 w-6 text-primary animate-pulse" />
-            <span className="text-2xl md:text-3xl font-bold text-primary tracking-wide italic">
-              Send encrypted messages to your friends and only your friend can decrypt and read it once (No more).
-            </span>
-            <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+      <section className="container mx-auto px-4 py-8 md:py-12">
+        <div className="max-w-4xl mx-auto">
+          {/* Action Buttons Row */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+            {user ? (
+              <Button onClick={handleGetStarted} className="gap-2 shadow-md">
+                <Lock className="h-4 w-4" />
+                Go to Dashboard
+              </Button>
+            ) : (
+              <>
+                <Button onClick={handleRegister} className="gap-2 shadow-md">
+                  <UserPlus className="h-4 w-4" />
+                  Register
+                </Button>
+                <Button variant="outline" onClick={handleLogin} className="gap-2">
+                  <Lock className="h-4 w-4" />
+                  Login
+                </Button>
+              </>
+            )}
+            <Button variant="secondary" onClick={() => setShowHowToUse(true)} className="gap-2">
+              <Share2 className="h-4 w-4" />
+              View Guide
+            </Button>
+            <Button variant="secondary" onClick={() => setShowInstallIOS(true)} className="gap-2">
+              <Smartphone className="h-4 w-4" />
+              Phone App Instructions
+            </Button>
           </div>
 
           {/* Main Hero Content */}
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-              Secure End-to-End Encryption
+          <div className="text-center mb-8">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight mb-4 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+              Send messages only your recipient can read.
             </h2>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
               Cracking this with classical computers would take <span className="font-bold text-primary">billions of years</span>
             </p>
-          </div>
-
-          {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {/* Start Encrypting Card */}
-            <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <CardHeader className="text-center">
-                <div className="mx-auto h-16 w-16 rounded-2xl bg-primary/20 flex items-center justify-center mb-4">
-                  <Key className="h-8 w-8 text-primary" />
-                </div>
-                <CardTitle className="text-2xl">Encrypt and Send</CardTitle>
-                <CardDescription className="text-base">
-                  Begin securing your messages now
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {user ? (
-                  <Button size="lg" onClick={handleGetStarted} className="w-full gap-2 h-12 text-lg shadow-md">
-                    <Lock className="h-5 w-5" />
-                    Go to Dashboard
-                  </Button>
-                ) : (
-                  <>
-                    <Button size="lg" onClick={handleRegister} className="w-full gap-2 h-12 text-lg shadow-md">
-                      <UserPlus className="h-5 w-5" />
-                      Register
-                    </Button>
-                    <Button size="lg" variant="outline" onClick={handleLogin} className="w-full gap-2 h-12 text-lg">
-                      <Lock className="h-5 w-5" />
-                      Login
-                    </Button>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* How to Use Card */}
-            <Card className="bg-gradient-to-br from-accent/5 to-accent/10 border-accent/20 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer" onClick={() => setShowHowToUse(true)}>
-              <CardHeader className="text-center">
-                <div className="mx-auto h-16 w-16 rounded-2xl bg-accent/20 flex items-center justify-center mb-4">
-                  <Users className="h-8 w-8 text-accent" />
-                </div>
-                <CardTitle className="text-2xl">How to Use</CardTitle>
-                
-                <CardDescription className="text-base">
-                  Learn the simple 4-step process
-                </CardDescription>
-                
-              </CardHeader>
-              <CardContent>
-                <Button size="lg" variant="outline" className="w-full gap-2 h-12 text-lg">
-                  <Share2 className="h-5 w-5" />
-                  View Guide →
-                </Button>
-              </CardContent>
-            </Card>
- {/* Install App Card */}
-            <Card className="bg-gradient-to-br from-success/5 to-success/10 border-success/20 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer md:col-span-2 lg:col-span-1" onClick={() => setShowInstallIOS(true)}>
-              <CardHeader className="text-center">
-                <div className="mx-auto h-16 w-16 rounded-2xl bg-success/20 flex items-center justify-center mb-4">
-                  <Smartphone className="h-8 w-8 text-success" />
-                </div>
-                <CardTitle className="text-2xl">Install App</CardTitle>
-                
-                <CardDescription className="text-base">
-                  iPhone, iPad & Android supported
-                </CardDescription>
-                
-              </CardHeader>
-              <CardContent>
-                <Button size="lg" variant="secondary" className="w-full gap-2 h-12 text-lg">
-                  <Smartphone className="h-5 w-5" />
-                  View Instructions
-                </Button>
-              </CardContent>
-            </Card>
-           
           </div>
 
           {/* iPhone Mockup */}
@@ -208,9 +150,8 @@ export default function Index() {
               <img 
                 src={iphoneImage} 
                 alt="iPhone showing encrypted message" 
-                className="relative w-full max-w-md h-auto shadow-2xl rounded-3xl"
+                className="relative w-full max-w-xs h-auto shadow-2xl rounded-3xl"
               />
-
             </div>
           </div>
         </div>
