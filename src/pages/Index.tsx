@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 import { Lock, Users, Smartphone, Share2, UserPlus, Mail, Key, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import iphoneImage from "@/assets/iphoneImage.png";
+import sendImage from "@/assets/send.jpg";
 import logo from "@/assets/logo.png";
-
 export default function Index() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -106,14 +107,28 @@ export default function Index() {
         <div className="max-w-4xl mx-auto">
           {/* Action Buttons Row with iPhone */}
           <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
-            {/* iPhone Image - Left Side */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 blur-2xl rounded-full opacity-50"></div>
-              <img 
-                src={iphoneImage} 
-                alt="iPhone showing encrypted message" 
-                className="relative w-48 h-auto shadow-xl rounded-xl"
-              />
+            {/* Image Carousel - Left Side */}
+            <div className="relative w-32">
+              <Carousel opts={{ loop: true }} className="w-full">
+                <CarouselContent>
+                  <CarouselItem>
+                    <img 
+                      src={iphoneImage} 
+                      alt="iPhone showing encrypted message" 
+                      className="w-full h-auto shadow-xl rounded-xl"
+                    />
+                  </CarouselItem>
+                  <CarouselItem>
+                    <img 
+                      src={sendImage} 
+                      alt="Send encrypted message" 
+                      className="w-full h-auto shadow-xl rounded-xl"
+                    />
+                  </CarouselItem>
+                </CarouselContent>
+                <CarouselPrevious className="left-0 h-6 w-6" />
+                <CarouselNext className="right-0 h-6 w-6" />
+              </Carousel>
             </div>
 
             {/* Buttons */}
