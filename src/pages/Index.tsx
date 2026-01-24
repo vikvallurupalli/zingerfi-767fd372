@@ -106,8 +106,8 @@ export default function Index() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-4xl mx-auto">
-          {/* Action Buttons Row with iPhone */}
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 md:gap-8 mb-8">
+          {/* Hero Row - Image + Content */}
+          <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10 mb-8">
             {/* Image Carousel - Left Side */}
             <div className="relative w-32 md:w-48 lg:w-56 flex-shrink-0">
               <Carousel 
@@ -134,43 +134,44 @@ export default function Index() {
               </Carousel>
             </div>
 
-            {/* Tagline */}
-            <div className="w-full md:w-auto text-center md:text-left">
+            {/* Right Side - Tagline + Buttons */}
+            <div className="flex flex-col items-center md:items-start justify-center text-center md:text-left">
+              {/* Tagline */}
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight mb-2 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
                 Send messages only your recipient can read.
               </h2>
-              <p className="text-sm md:text-base text-muted-foreground">
+              <p className="text-sm md:text-base text-muted-foreground mb-4">
                 Cracking this with classical computers would take <span className="font-bold text-primary">billions of years</span>
               </p>
-            </div>
 
-            {/* Buttons */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 w-full md:w-auto">
-              {user ? (
-                <Button onClick={handleGetStarted} className="gap-2 shadow-md">
-                  <Lock className="h-4 w-4" />
-                  Go to Dashboard
-                </Button>
-              ) : (
-                <>
-                  <Button onClick={handleRegister} className="gap-2 shadow-md">
-                    <UserPlus className="h-4 w-4" />
-                    Register
-                  </Button>
-                  <Button variant="outline" onClick={handleLogin} className="gap-2">
+              {/* Buttons */}
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                {user ? (
+                  <Button onClick={handleGetStarted} className="gap-2 shadow-md">
                     <Lock className="h-4 w-4" />
-                    Login
+                    Go to Dashboard
                   </Button>
-                </>
-              )}
-              <Button variant="secondary" onClick={() => setShowHowToUse(true)} className="gap-2">
-                <Share2 className="h-4 w-4" />
-                View Guide
-              </Button>
-              <Button variant="secondary" onClick={() => setShowInstallIOS(true)} className="gap-2">
-                <Smartphone className="h-4 w-4" />
-                Phone App Instructions
-              </Button>
+                ) : (
+                  <>
+                    <Button onClick={handleRegister} className="gap-2 shadow-md">
+                      <UserPlus className="h-4 w-4" />
+                      Register
+                    </Button>
+                    <Button variant="outline" onClick={handleLogin} className="gap-2">
+                      <Lock className="h-4 w-4" />
+                      Login
+                    </Button>
+                  </>
+                )}
+                <Button variant="secondary" onClick={() => setShowHowToUse(true)} className="gap-2">
+                  <Share2 className="h-4 w-4" />
+                  View Guide
+                </Button>
+                <Button variant="secondary" onClick={() => setShowInstallIOS(true)} className="gap-2">
+                  <Smartphone className="h-4 w-4" />
+                  Phone App Instructions
+                </Button>
+              </div>
             </div>
           </div>
         </div>
