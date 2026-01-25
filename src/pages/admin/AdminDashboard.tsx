@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Settings, Shield, BarChart3 } from "lucide-react";
+import { Users, Settings, Shield, BarChart3, MessageSquare } from "lucide-react";
 
 const adminFunctions = [
   {
@@ -15,6 +15,12 @@ const adminFunctions = [
     description: "Manage user roles and permissions",
     icon: Shield,
     path: "/admin/roles",
+  },
+  {
+    title: "Feedback",
+    description: "Review and manage user feedback and support requests",
+    icon: MessageSquare,
+    path: "/admin/feedback",
   },
   {
     title: "Analytics",

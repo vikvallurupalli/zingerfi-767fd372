@@ -14,11 +14,13 @@ import Confides from "./pages/Confides";
 import SendRequest from "./pages/SendRequest";
 import PendingRequests from "./pages/PendingRequests";
 import IncomingRequests from "./pages/IncomingRequests";
+import Feedback from "./pages/Feedback";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import CustomerSearch from "./pages/admin/CustomerSearch";
 import UserRoles from "./pages/admin/UserRoles";
+import FeedbackManagement from "./pages/admin/FeedbackManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -153,6 +155,22 @@ const App = () => (
                 <AdminRoute>
                   <UserRoles />
                 </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/feedback"
+              element={
+                <AdminRoute>
+                  <FeedbackManagement />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/feedback"
+              element={
+                <ProtectedRoute>
+                  <Feedback />
+                </ProtectedRoute>
               }
             />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
