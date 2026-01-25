@@ -15,6 +15,7 @@ import {
   LogOut,
   Shield,
   Settings,
+  MessageSquare,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 
@@ -82,6 +83,7 @@ export function Layout({ children }: LayoutProps) {
     { path: "/send-request", icon: Send, label: "Add Confide" },
     { path: "/pending-requests", icon: Clock, label: "Pending", count: pendingCount },
     { path: "/incoming-requests", icon: Inbox, label: "Incoming", count: incomingCount },
+    { path: "/feedback", icon: MessageSquare, label: "Feedback" },
   ];
 
   return (
