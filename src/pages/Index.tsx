@@ -7,6 +7,7 @@ import Autoplay from "embla-carousel-autoplay";
 import { Lock, Users, Smartphone, Share2, UserPlus, Mail, Key, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { RotatingFeatureCard } from "@/components/RotatingFeatureCard";
+import { WelcomePopup } from "@/components/WelcomePopup";
 import sendImage from "@/assets/send.jpg";
 import smsImage from "@/assets/sms.jpg";
 import logo from "@/assets/logo.png";
@@ -63,6 +64,7 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">
+      <WelcomePopup />
       {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-3 md:py-4">
