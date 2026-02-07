@@ -140,6 +140,101 @@ export type Database = {
         }
         Relationships: []
       }
+      fast_encrypt_contacts: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      fast_encrypt_keypairs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          private_key: string
+          public_key: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          private_key: string
+          public_key: string
+          version: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          private_key?: string
+          public_key?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      fast_encrypt_messages: {
+        Row: {
+          created_at: string
+          decrypted_at: string | null
+          id: string
+          is_decrypted: boolean
+          keypair_id: string
+          message_uid: string
+          recipient_email: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          decrypted_at?: string | null
+          id?: string
+          is_decrypted?: boolean
+          keypair_id: string
+          message_uid: string
+          recipient_email: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          decrypted_at?: string | null
+          id?: string
+          is_decrypted?: boolean
+          keypair_id?: string
+          message_uid?: string
+          recipient_email?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fast_encrypt_messages_keypair_id_fkey"
+            columns: ["keypair_id"]
+            isOneToOne: false
+            referencedRelation: "fast_encrypt_keypairs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feedback: {
         Row: {
           admin_notes: string | null
@@ -235,6 +330,14 @@ export type Database = {
       delete_confide: {
         Args: { confide_user_id_param: string }
         Returns: undefined
+      }
+      get_active_fast_encrypt_public_key: {
+        Args: never
+        Returns: {
+          keypair_id: string
+          public_key: string
+          version: number
+        }[]
       }
       get_user_role: {
         Args: { _user_id: string }
