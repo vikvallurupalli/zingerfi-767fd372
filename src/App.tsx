@@ -22,6 +22,9 @@ import CustomerSearch from "./pages/admin/CustomerSearch";
 import UserRoles from "./pages/admin/UserRoles";
 import FeedbackManagement from "./pages/admin/FeedbackManagement";
 import NotFound from "./pages/NotFound";
+import FastEncryptDashboard from "./pages/FastEncryptDashboard";
+import FastEncryptPage from "./pages/FastEncrypt";
+import FastDecryptPage from "./pages/FastDecrypt";
 
 const queryClient = new QueryClient();
 
@@ -170,6 +173,30 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Feedback />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fast-dashboard"
+              element={
+                <ProtectedRoute>
+                  <FastEncryptDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fast-encrypt"
+              element={
+                <ProtectedRoute>
+                  <FastEncryptPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fast-decrypt"
+              element={
+                <ProtectedRoute>
+                  <FastDecryptPage />
                 </ProtectedRoute>
               }
             />
