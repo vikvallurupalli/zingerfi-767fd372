@@ -1,1 +1,7 @@
 project_id = "htdazgwnjuorpasrrxfd"
+
+[functions.fast-encrypt-init]
+verify_jwt = false
+
+[functions.fast-decrypt]
+verify_jwt = false
