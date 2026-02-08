@@ -26,6 +26,8 @@ export default function FastDecryptPage() {
   const [decryptedMessage, setDecryptedMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showWarningModal, setShowWarningModal] = useState(false);
+  const [showAlreadyDecryptedModal, setShowAlreadyDecryptedModal] = useState(false);
+  const [showStolenMessageModal, setShowStolenMessageModal] = useState(false);
 
   // Pre-populate from URL parameter
   useEffect(() => {
@@ -60,11 +62,46 @@ export default function FastDecryptPage() {
 
       if (error) {
         console.error("Decrypt function error:", error);
-        // Try to parse the error message from the response
+        // Check for specific error status codes from the edge function
+        try {
+          const errorBody = JSON.parse(error.message || "{}");
+          if (error.message?.includes("already been decrypted")) {
+            setShowAlreadyDecryptedModal(true);
+            return;
+          }
+          if (error.message?.includes("not the intended recipient")) {
+            setShowStolenMessageModal(true);
+            return;
+          }
+        } catch {}
+        
+        // Try context from error.context if available
+        if (error.context) {
+          try {
+            const ctx = await error.context.json();
+            if (ctx?.error?.includes("already been decrypted")) {
+              setShowAlreadyDecryptedModal(true);
+              return;
+            }
+            if (ctx?.error?.includes("not the intended recipient")) {
+              setShowStolenMessageModal(true);
+              return;
+            }
+          } catch {}
+        }
+        
         throw new Error(error.message || "Decryption failed");
       }
 
       if (data?.error) {
+        if (data.error.includes("already been decrypted")) {
+          setShowAlreadyDecryptedModal(true);
+          return;
+        }
+        if (data.error.includes("not the intended recipient")) {
+          setShowStolenMessageModal(true);
+          return;
+        }
         toast.error(data.error);
         return;
       }
@@ -185,6 +222,38 @@ export default function FastDecryptPage() {
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setShowWarningModal(false)}>
               I understand
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showAlreadyDecryptedModal} onOpenChange={setShowAlreadyDecryptedModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>🚫 Message Already Decrypted</AlertDialogTitle>
+            <AlertDialogDescription>
+              This message has already been decrypted and cannot be decrypted again. Each encrypted message can only be read once for your security.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowAlreadyDecryptedModal(false)}>
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showStolenMessageModal} onOpenChange={setShowStolenMessageModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>🔒 Unauthorized Access</AlertDialogTitle>
+            <AlertDialogDescription>
+              This message was not intended for you. It appears to be stolen and cannot be decrypted. Only the original intended recipient can decrypt this message.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowStolenMessageModal(false)}>
+              OK
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
