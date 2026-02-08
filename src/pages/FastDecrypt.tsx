@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,10 +21,19 @@ import { parseFastEncryptPayload } from "@/lib/fast-crypto";
 
 export default function FastDecryptPage() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [encryptedInput, setEncryptedInput] = useState("");
   const [decryptedMessage, setDecryptedMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showWarningModal, setShowWarningModal] = useState(false);
+
+  // Pre-populate from URL parameter
+  useEffect(() => {
+    const messageParam = searchParams.get("m");
+    if (messageParam) {
+      setEncryptedInput(messageParam);
+    }
+  }, [searchParams]);
 
   const handleDecrypt = async () => {
     if (!encryptedInput || !user) {

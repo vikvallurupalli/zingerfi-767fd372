@@ -166,7 +166,8 @@ export default function FastEncryptPage() {
   };
 
   const createShareLink = () => {
-    return encryptedText;
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/fast-decrypt?m=${encodeURIComponent(encryptedText)}`;
   };
 
   const handleSMS = () => {
