@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { Lock, Users, Smartphone, Share2, UserPlus, Mail, Key, LogOut, Zap } from "lucide-react";
+import { Lock, Users, Smartphone, Share2, UserPlus, Mail, Key, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { RotatingFeatureCard } from "@/components/RotatingFeatureCard";
 import { WelcomePopup } from "@/components/WelcomePopup";
@@ -47,7 +47,7 @@ export default function Index() {
 
   const handleGetStarted = () => {
     if (user) {
-      navigate("/dashboard");
+      navigate("/fast-dashboard");
     } else {
       navigate("/auth");
     }
@@ -160,10 +160,6 @@ export default function Index() {
                     <Button onClick={handleGetStarted} className="gap-2 shadow-md">
                       <Lock className="h-4 w-4" />
                       Go to Dashboard
-                    </Button>
-                    <Button variant="outline" onClick={() => navigate("/fast-dashboard")} className="gap-2 shadow-md">
-                      <Zap className="h-4 w-4" />
-                      FastEncrypt
                     </Button>
                   </>
                 ) : (
