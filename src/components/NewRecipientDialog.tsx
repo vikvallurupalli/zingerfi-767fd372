@@ -20,19 +20,29 @@ interface NewRecipientDialogProps {
 export function NewRecipientDialog({ open, onOpenChange, onAdd }: NewRecipientDialogProps) {
   const [email, setEmail] = useState("");
   const [alias, setAlias] = useState("");
+  const [error, setError] = useState("");
 
   const handleAdd = () => {
     const trimmedEmail = email.trim().toLowerCase();
-    if (!trimmedEmail) return;
+    if (!trimmedEmail) {
+      setError("Please enter an email address");
+      return;
+    }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(trimmedEmail) || !trimmedEmail.endsWith("@gmail.com")) return;
+    if (!emailRegex.test(trimmedEmail)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+    if (!trimmedEmail.endsWith("@gmail.com")) {
+      setError("Only Gmail addresses are supported");
+      return;
+    }
+    setError("");
     onAdd(trimmedEmail, alias.trim() || undefined);
     setEmail("");
     setAlias("");
     onOpenChange(false);
   };
-
-  const isValid = /^[^\s@]+@gmail\.com$/i.test(email.trim());
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -51,9 +61,10 @@ export function NewRecipientDialog({ open, onOpenChange, onAdd }: NewRecipientDi
               type="email"
               placeholder="recipient@gmail.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && isValid && handleAdd()}
+              onChange={(e) => { setEmail(e.target.value); setError(""); }}
+              onKeyDown={(e) => e.key === "Enter" && handleAdd()}
             />
+            {error && <p className="text-sm text-destructive mt-1">{error}</p>}
           </div>
           <div>
             <Label htmlFor="recipient-alias">Display Name (optional)</Label>
@@ -62,7 +73,7 @@ export function NewRecipientDialog({ open, onOpenChange, onAdd }: NewRecipientDi
               placeholder="e.g. John Smith"
               value={alias}
               onChange={(e) => setAlias(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && isValid && handleAdd()}
+              onKeyDown={(e) => e.key === "Enter" && handleAdd()}
             />
           </div>
         </div>
@@ -70,7 +81,7 @@ export function NewRecipientDialog({ open, onOpenChange, onAdd }: NewRecipientDi
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleAdd} disabled={!isValid}>
+          <Button onClick={handleAdd}>
             Add Recipient
           </Button>
         </DialogFooter>

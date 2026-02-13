@@ -31,8 +31,8 @@ export function Layout({ children }: LayoutProps) {
     { path: "/fast-dashboard", icon: Shield, label: "Dashboard" },
     { path: "/encrypt", icon: Lock, label: "Encrypt" },
     { path: "/decrypt", icon: Unlock, label: "Decrypt" },
-    { path: "/confides", icon: Users, label: "Confides" },
-    { path: "/send-request", icon: Send, label: "Add Confide" },
+    { path: "/fast-encrypt", icon: Users, label: "Confides" },
+    { path: "/fast-encrypt", icon: Send, label: "Add Confide" },
     { path: "/feedback", icon: MessageSquare, label: "Feedback" },
   ];
 
