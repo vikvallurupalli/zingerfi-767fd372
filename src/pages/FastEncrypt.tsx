@@ -8,10 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Lock, Copy, Trash2, MessageSquare, Send, Zap } from "lucide-react";
+import { Lock, Copy, Trash2, MessageSquare, Send, Zap, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { fastEncrypt, formatFastEncryptPayload } from "@/lib/fast-crypto";
 import { SaveContactDialog } from "@/components/SaveContactDialog";
+import { NewRecipientDialog } from "@/components/NewRecipientDialog";
 
 interface Contact {
   id: string;
@@ -21,11 +22,17 @@ interface Contact {
 
 const NEW_EMAIL_VALUE = "__new_email__";
 
+interface ManualRecipient {
+  email: string;
+  alias?: string;
+}
+
 export default function FastEncryptPage() {
   const { user } = useAuth();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedContact, setSelectedContact] = useState("");
-  const [newEmail, setNewEmail] = useState("");
+  const [manualRecipient, setManualRecipient] = useState<ManualRecipient | null>(null);
+  const [showNewRecipient, setShowNewRecipient] = useState(false);
   const [message, setMessage] = useState("");
   const [encryptedText, setEncryptedText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -52,11 +59,16 @@ export default function FastEncryptPage() {
   };
 
   const getRecipientEmail = (): string => {
-    if (selectedContact === NEW_EMAIL_VALUE) {
-      return newEmail.trim().toLowerCase();
+    if (manualRecipient) {
+      return manualRecipient.email;
     }
     const contact = contacts.find((c) => c.id === selectedContact);
     return contact?.email || "";
+  };
+
+  const handleAddManualRecipient = (email: string, alias?: string) => {
+    setManualRecipient({ email, alias });
+    setSelectedContact("");
   };
 
   const handleEncrypt = async () => {
@@ -113,7 +125,7 @@ export default function FastEncryptPage() {
       toast.success("Message encrypted successfully!");
 
       // Check if this is a new email not in contacts
-      const isNewEmail = selectedContact === NEW_EMAIL_VALUE || 
+      const isNewEmail = manualRecipient != null || 
         !contacts.some((c) => c.email.toLowerCase() === recipientEmail.toLowerCase());
       
       if (isNewEmail) {
@@ -162,7 +174,7 @@ export default function FastEncryptPage() {
     setMessage("");
     setEncryptedText("");
     setSelectedContact("");
-    setNewEmail("");
+    setManualRecipient(null);
   };
 
   const createShareLink = () => {
@@ -209,39 +221,45 @@ export default function FastEncryptPage() {
         <Card>
           <CardHeader>
             <CardTitle>Recipient</CardTitle>
-            <CardDescription>Choose a saved contact or enter a new email address</CardDescription>
+            <CardDescription>Choose a saved contact or add a new recipient</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label>Select Contact or Enter New</Label>
-              <Select value={selectedContact} onValueChange={(val) => {
-                setSelectedContact(val);
-                if (val !== NEW_EMAIL_VALUE) setNewEmail("");
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose recipient..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NEW_EMAIL_VALUE}>📧 Enter new email address</SelectItem>
-                  {contacts.map((contact) => (
-                    <SelectItem key={contact.id} value={contact.id}>
-                      {contact.name} ({contact.email})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex gap-2 items-end">
+              <div className="flex-1">
+                <Label>Select Contact</Label>
+                <Select value={selectedContact} onValueChange={(val) => {
+                  setSelectedContact(val);
+                  setManualRecipient(null);
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose recipient..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {contacts.map((contact) => (
+                      <SelectItem key={contact.id} value={contact.id}>
+                        {contact.name} ({contact.email})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1 shrink-0"
+                onClick={() => setShowNewRecipient(true)}
+              >
+                <UserPlus className="h-4 w-4" />
+                Enter New
+              </Button>
             </div>
 
-            {selectedContact === NEW_EMAIL_VALUE && (
-              <div>
-                <Label htmlFor="new-email">Recipient Email</Label>
-                <Input
-                  id="new-email"
-                  type="email"
-                  placeholder="recipient@example.com"
-                  value={newEmail}
-                  onChange={(e) => setNewEmail(e.target.value)}
-                />
+            {manualRecipient && (
+              <div className="rounded-md border border-primary/20 bg-primary/5 p-3 text-sm">
+                <span className="font-medium">{manualRecipient.alias || manualRecipient.email}</span>
+                {manualRecipient.alias && (
+                  <span className="text-muted-foreground ml-1">({manualRecipient.email})</span>
+                )}
               </div>
             )}
           </CardContent>
@@ -324,6 +342,12 @@ export default function FastEncryptPage() {
           onOpenChange={setShowSaveContact}
           email={pendingSaveEmail}
           onSave={handleSaveContact}
+        />
+
+        <NewRecipientDialog
+          open={showNewRecipient}
+          onOpenChange={setShowNewRecipient}
+          onAdd={handleAddManualRecipient}
         />
       </div>
     </Layout>
