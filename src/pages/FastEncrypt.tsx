@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Lock, Copy, Trash2, MessageSquare, Send, Zap, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { fastEncrypt, formatFastEncryptPayload } from "@/lib/fast-crypto";
-import { SaveContactDialog } from "@/components/SaveContactDialog";
+
 import { NewRecipientDialog } from "@/components/NewRecipientDialog";
 
 interface Contact {
@@ -36,8 +36,6 @@ export default function FastEncryptPage() {
   const [message, setMessage] = useState("");
   const [encryptedText, setEncryptedText] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showSaveContact, setShowSaveContact] = useState(false);
-  const [pendingSaveEmail, setPendingSaveEmail] = useState("");
 
   useEffect(() => {
     if (user) loadContacts();
@@ -124,13 +122,14 @@ export default function FastEncryptPage() {
 
       toast.success("Message encrypted successfully!");
 
-      // Check if this is a new email not in contacts
-      const isNewEmail = manualRecipient != null || 
-        !contacts.some((c) => c.email.toLowerCase() === recipientEmail.toLowerCase());
-      
-      if (isNewEmail) {
-        setPendingSaveEmail(recipientEmail);
-        setShowSaveContact(true);
+      // Auto-save contact if manual recipient with alias was provided
+      if (manualRecipient?.alias) {
+        const alreadyExists = contacts.some(
+          (c) => c.email.toLowerCase() === recipientEmail.toLowerCase()
+        );
+        if (!alreadyExists) {
+          await handleSaveContact(manualRecipient.alias);
+        }
       }
     } catch (error) {
       console.error("Encryption error:", error);
@@ -141,13 +140,15 @@ export default function FastEncryptPage() {
   };
 
   const handleSaveContact = async (name: string) => {
-    if (!user || !pendingSaveEmail) return;
+    if (!user) return;
+    const emailToSave = getRecipientEmail();
+    if (!emailToSave) return;
     
     const { error } = await supabase
       .from("fast_encrypt_contacts" as any)
       .insert({
         user_id: user.id,
-        email: pendingSaveEmail,
+        email: emailToSave,
         name: name,
       });
 
@@ -162,7 +163,7 @@ export default function FastEncryptPage() {
     }
 
     toast.success("Contact saved!");
-    loadContacts();
+    await loadContacts();
   };
 
   const handleCopy = () => {
@@ -336,13 +337,6 @@ export default function FastEncryptPage() {
             </CardContent>
           </Card>
         )}
-
-        <SaveContactDialog
-          open={showSaveContact}
-          onOpenChange={setShowSaveContact}
-          email={pendingSaveEmail}
-          onSave={handleSaveContact}
-        />
 
         <NewRecipientDialog
           open={showNewRecipient}
