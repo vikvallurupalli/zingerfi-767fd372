@@ -62,7 +62,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!isSuperAdmin) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/fast-dashboard" replace />;
   }
 
   return <>{children}</>;
