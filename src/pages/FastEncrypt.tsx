@@ -82,6 +82,10 @@ export default function FastEncryptPage() {
       toast.error("Please enter a valid email address");
       return;
     }
+    if (!recipientEmail.toLowerCase().endsWith("@gmail.com")) {
+      toast.error("Only Gmail addresses are supported");
+      return;
+    }
 
     setLoading(true);
     try {

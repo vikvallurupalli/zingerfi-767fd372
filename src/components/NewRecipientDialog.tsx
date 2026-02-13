@@ -25,14 +25,14 @@ export function NewRecipientDialog({ open, onOpenChange, onAdd }: NewRecipientDi
     const trimmedEmail = email.trim().toLowerCase();
     if (!trimmedEmail) return;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(trimmedEmail)) return;
+    if (!emailRegex.test(trimmedEmail) || !trimmedEmail.endsWith("@gmail.com")) return;
     onAdd(trimmedEmail, alias.trim() || undefined);
     setEmail("");
     setAlias("");
     onOpenChange(false);
   };
 
-  const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const isValid = /^[^\s@]+@gmail\.com$/i.test(email.trim());
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -49,7 +49,7 @@ export function NewRecipientDialog({ open, onOpenChange, onAdd }: NewRecipientDi
             <Input
               id="recipient-email"
               type="email"
-              placeholder="recipient@example.com"
+              placeholder="recipient@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && isValid && handleAdd()}
