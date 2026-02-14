@@ -209,34 +209,33 @@ export default function FastEncryptPage() {
 
   return (
     <Layout>
-      <div className="max-w-[42rem] mx-auto space-y-6">
-        <div className="text-center space-y-2">
-          <div className="flex justify-center mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <Zap className="h-6 w-6 text-primary" />
+      <div className="max-w-md mx-auto space-y-3">
+        <div className="text-center space-y-1">
+          <div className="flex justify-center mb-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+              <Zap className="h-4 w-4 text-primary" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold">FastEncrypt Message</h1>
-          <p className="text-muted-foreground">
-            Encrypt a message for any email address — no confide setup needed
+          <h1 className="text-xl font-bold">FastEncrypt Message</h1>
+          <p className="text-xs text-muted-foreground">
+            Encrypt a message for any email address
           </p>
         </div>
 
         {/* Recipient Selection */}
         <Card>
-          <CardHeader>
-            <CardTitle>Recipient</CardTitle>
-            <CardDescription>Choose a saved contact or add a new recipient</CardDescription>
+          <CardHeader className="p-3 pb-1">
+            <CardTitle className="text-sm">Recipient</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-3 pt-1 space-y-2">
             <div className="flex gap-2 items-end">
               <div className="flex-1">
-                <Label>Select Contact</Label>
+                <Label className="text-xs">Select Contact</Label>
                 <Select value={selectedContact} onValueChange={(val) => {
                   setSelectedContact(val);
                   setManualRecipient(null);
                 }}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 text-xs">
                     <SelectValue placeholder="Choose recipient..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -251,16 +250,16 @@ export default function FastEncryptPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-1 shrink-0"
+                className="gap-1 shrink-0 h-8 text-xs"
                 onClick={() => setShowNewRecipient(true)}
               >
-                <UserPlus className="h-4 w-4" />
-                Enter New
+                <UserPlus className="h-3 w-3" />
+                New
               </Button>
             </div>
 
             {manualRecipient && (
-              <div className="rounded-md border border-primary/20 bg-primary/5 p-3 text-sm">
+              <div className="rounded-md border border-primary/20 bg-primary/5 p-2 text-xs">
                 <span className="font-medium">{manualRecipient.alias || manualRecipient.email}</span>
                 {manualRecipient.alias && (
                   <span className="text-muted-foreground ml-1">({manualRecipient.email})</span>
@@ -271,73 +270,69 @@ export default function FastEncryptPage() {
         </Card>
 
         {/* Message Input */}
-        <div className="flex gap-6">
-          <Card className="flex-1">
-            <CardHeader>
-              <CardTitle>Message</CardTitle>
-              <CardDescription>Enter the message you want to encrypt</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Textarea
-                placeholder="Enter your message here..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows={6}
-                className="resize-none text-base"
-              />
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleEncrypt}
-                  disabled={loading || !getRecipientEmail() || !message}
-                  className="gap-2"
-                >
-                  <Lock className="h-4 w-4" />
-                  {loading ? "Encrypting..." : "Encrypt"}
-                </Button>
-                <Button variant="outline" onClick={handleClear} className="gap-2">
-                  <Trash2 className="h-4 w-4" />
-                  Clear
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {encryptedText && (
-            <div className="flex flex-col gap-2 w-32">
-              <Button onClick={handleSMS} variant="outline" size="sm" className="gap-1 text-xs">
-                <MessageSquare className="h-3 w-3" />
-                SMS
+        <Card>
+          <CardHeader className="p-3 pb-1">
+            <CardTitle className="text-sm">Message</CardTitle>
+          </CardHeader>
+          <CardContent className="p-3 pt-1 space-y-2">
+            <Textarea
+              placeholder="Enter your message here..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={3}
+              className="resize-none text-sm"
+            />
+            <div className="flex gap-2">
+              <Button
+                onClick={handleEncrypt}
+                disabled={loading || !getRecipientEmail() || !message}
+                className="gap-1 h-8 text-xs"
+                size="sm"
+              >
+                <Lock className="h-3 w-3" />
+                {loading ? "Encrypting..." : "Encrypt"}
               </Button>
-              <Button onClick={handleWhatsApp} variant="outline" size="sm" className="gap-1 text-xs">
-                <Send className="h-3 w-3" />
-                WhatsApp
-              </Button>
-              <Button onClick={handleTelegram} variant="outline" size="sm" className="gap-1 text-xs">
-                <Send className="h-3 w-3" />
-                Telegram
-              </Button>
-              <Button onClick={handleGmail} variant="outline" size="sm" className="gap-1 text-xs">
-                <Send className="h-3 w-3" />
-                Gmail
-              </Button>
-              <Button onClick={handleOutlook} variant="outline" size="sm" className="gap-1 text-xs">
-                <Send className="h-3 w-3" />
-                Outlook
-              </Button>
-              <Button onClick={handleCopy} variant="secondary" size="sm" className="gap-1 text-xs h-auto py-2 whitespace-normal text-center">
-                <Copy className="h-3 w-3 flex-shrink-0" />
-                Copy
+              <Button variant="outline" onClick={handleClear} className="gap-1 h-8 text-xs" size="sm">
+                <Trash2 className="h-3 w-3" />
+                Clear
               </Button>
             </div>
-          )}
-        </div>
+          </CardContent>
+        </Card>
 
+        {/* Share Buttons */}
         {encryptedText && (
           <Card className="bg-primary/5 border-primary/20">
-            <CardContent className="pt-6">
-              <p className="text-sm text-center text-muted-foreground">
-                ✅ Encryption complete! Use the buttons above to share the encrypted message. Only the intended recipient can decrypt it (one time only).
+            <CardContent className="p-3 space-y-2">
+              <p className="text-xs text-center text-muted-foreground">
+                ✅ Encrypted! Share via:
               </p>
+              <div className="grid grid-cols-3 gap-2">
+                <Button onClick={handleSMS} variant="sms" size="sm" className="gap-1 text-xs h-8">
+                  <MessageSquare className="h-3 w-3" />
+                  SMS
+                </Button>
+                <Button onClick={handleWhatsApp} variant="whatsapp" size="sm" className="gap-1 text-xs h-8">
+                  <Send className="h-3 w-3" />
+                  WhatsApp
+                </Button>
+                <Button onClick={handleTelegram} variant="telegram" size="sm" className="gap-1 text-xs h-8">
+                  <Send className="h-3 w-3" />
+                  Telegram
+                </Button>
+                <Button onClick={handleGmail} variant="gmail" size="sm" className="gap-1 text-xs h-8">
+                  <Send className="h-3 w-3" />
+                  Gmail
+                </Button>
+                <Button onClick={handleOutlook} variant="outlook" size="sm" className="gap-1 text-xs h-8">
+                  <Send className="h-3 w-3" />
+                  Outlook
+                </Button>
+                <Button onClick={handleCopy} variant="secondary" size="sm" className="gap-1 text-xs h-8">
+                  <Copy className="h-3 w-3" />
+                  Copy
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}

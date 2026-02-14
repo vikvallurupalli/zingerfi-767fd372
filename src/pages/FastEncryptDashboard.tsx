@@ -95,42 +95,24 @@ export default function FastEncryptDashboard() {
         </div>
 
         {/* Action Cards */}
-        <div className="grid gap-6 md:grid-cols-2 max-w-2xl mx-auto">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <Lock className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>FastEncrypt Message</CardTitle>
-              <CardDescription>
-                Encrypt a message for any email address. No confide setup required.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link to="/fast-encrypt">
-                <Button className="w-full gap-2">
-                  <Lock className="h-4 w-4" />
-                  Start Encrypting
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+        <div className="grid gap-3 grid-cols-2 max-w-sm mx-auto">
+          <Link to="/fast-encrypt">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardContent className="p-4 flex flex-col items-center justify-center gap-2">
+                <Lock className="h-6 w-6 text-primary" />
+                <span className="text-sm font-semibold">Encrypt</span>
+              </CardContent>
+            </Card>
+          </Link>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <Unlock className="h-8 w-8 text-accent mb-2" />
-              <CardTitle>FastDecrypt Message</CardTitle>
-              <CardDescription>
-                Decrypt a message sent to your email. Each message can only be decrypted once.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link to="/fast-decrypt">
-                <Button variant="outline" className="w-full gap-2">
-                  <Unlock className="h-4 w-4" />
-                  Start Decrypting
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          <Link to="/fast-decrypt">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardContent className="p-4 flex flex-col items-center justify-center gap-2">
+                <Unlock className="h-6 w-6 text-accent" />
+                <span className="text-sm font-semibold">Decrypt</span>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {/* How It Works */}
