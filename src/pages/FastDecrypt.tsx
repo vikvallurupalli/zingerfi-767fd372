@@ -132,46 +132,44 @@ export default function FastDecryptPage() {
 
   return (
     <Layout>
-      <div className="max-w-[42rem] mx-auto space-y-6">
-        <div className="text-center space-y-2">
-          <div className="flex justify-center mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
-              <Zap className="h-6 w-6 text-accent" />
+      <div className="max-w-md mx-auto space-y-3">
+        <div className="text-center space-y-1">
+          <div className="flex justify-center mb-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10">
+              <Zap className="h-4 w-4 text-accent" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold">FastDecrypt Message</h1>
-          <p className="text-muted-foreground">
-            Paste the encrypted FEID message you received to decrypt it
+          <h1 className="text-xl font-bold">FastDecrypt Message</h1>
+          <p className="text-xs text-muted-foreground">
+            Paste the encrypted FEID message to decrypt it
           </p>
         </div>
 
         {/* Encrypted Input */}
         <Card>
-          <CardHeader>
-            <CardTitle>Encrypted Message</CardTitle>
-            <CardDescription>
-              Paste the complete FEID message (starts with "FEID:")
-            </CardDescription>
+          <CardHeader className="p-3 pb-1">
+            <CardTitle className="text-sm">Encrypted Message</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-3 pt-1 space-y-2">
             <Textarea
               placeholder="Paste FEID:... message here..."
               value={encryptedInput}
               onChange={(e) => setEncryptedInput(e.target.value)}
-              rows={6}
-              className="resize-none text-sm font-mono"
+              rows={3}
+              className="resize-none text-xs font-mono"
             />
             <div className="flex gap-2">
               <Button
                 onClick={handleDecrypt}
                 disabled={loading || !encryptedInput}
-                className="gap-2"
+                className="gap-1 h-8 text-xs"
+                size="sm"
               >
-                <Unlock className="h-4 w-4" />
+                <Unlock className="h-3 w-3" />
                 {loading ? "Decrypting..." : "Decrypt"}
               </Button>
-              <Button variant="outline" onClick={handleClear} className="gap-2">
-                <Trash2 className="h-4 w-4" />
+              <Button variant="outline" onClick={handleClear} className="gap-1 h-8 text-xs" size="sm">
+                <Trash2 className="h-3 w-3" />
                 Clear
               </Button>
             </div>
@@ -180,20 +178,19 @@ export default function FastDecryptPage() {
 
         {/* Decrypted Output */}
         <Card className={`border-success/50 ${!decryptedMessage ? "opacity-50" : ""}`}>
-          <CardHeader>
-            <CardTitle>Decrypted Message</CardTitle>
-            <CardDescription>Your decrypted message will appear here</CardDescription>
+          <CardHeader className="p-3 pb-1">
+            <CardTitle className="text-sm">Decrypted Message</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-3 pt-1 space-y-2">
             <Textarea
               value={decryptedMessage}
               readOnly
-              rows={6}
+              rows={3}
               placeholder="Decrypted message will appear here..."
-              className="resize-none text-base font-medium text-foreground"
+              className="resize-none text-sm font-medium text-foreground"
             />
-            <Button onClick={handleCopy} disabled={!decryptedMessage} className="w-full gap-2">
-              <Copy className="h-4 w-4" />
+            <Button onClick={handleCopy} disabled={!decryptedMessage} className="w-full gap-1 h-8 text-xs" size="sm">
+              <Copy className="h-3 w-3" />
               Copy to Clipboard
             </Button>
           </CardContent>
@@ -201,11 +198,11 @@ export default function FastDecryptPage() {
 
         {/* Info Card */}
         <Card className="bg-secondary/20">
-          <CardContent className="pt-6">
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>🔒 <strong>One-time decryption:</strong> Each message can only be decrypted once.</p>
-              <p>📧 <strong>Recipient locked:</strong> Only the email address specified by the sender can decrypt.</p>
-              <p>🚫 <strong>No message stored:</strong> The actual message is never saved on the server.</p>
+          <CardContent className="p-3">
+            <div className="space-y-1 text-xs text-muted-foreground">
+              <p>🔒 One-time decryption only</p>
+              <p>📧 Recipient-locked by email</p>
+              <p>🚫 No message stored on server</p>
             </div>
           </CardContent>
         </Card>
