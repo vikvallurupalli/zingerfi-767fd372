@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,114 +17,113 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Users, Trash2, Edit2, Save, X, UserPlus } from "lucide-react";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { NewRecipientDialog } from "@/components/NewRecipientDialog";
 
-interface Confide {
+interface Contact {
   id: string;
-  confide_user_id: string;
-  alias: string | null;
-  profiles: {
-    email: string;
-  };
+  email: string;
+  name: string;
 }
 
 export default function Confides() {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const [confides, setConfides] = useState<Confide[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editAlias, setEditAlias] = useState("");
+  const [editName, setEditName] = useState("");
   const [loading, setLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [confideToDelete, setConfideToDelete] = useState<{ id: string; userId: string; displayName: string } | null>(null);
+  const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
+  const [showNewRecipient, setShowNewRecipient] = useState(false);
 
-  useEffect(() => {
-    loadConfides();
-  }, [user]);
-
-  const loadConfides = async () => {
+  const loadContacts = useCallback(async () => {
     if (!user) return;
-
     const { data, error } = await supabase
-      .from("confides")
-      .select(`
-        id,
-        confide_user_id,
-        alias,
-        profiles!confides_confide_user_id_fkey (
-          email
-        )
-      `)
+      .from("fast_encrypt_contacts")
+      .select("id, email, name")
       .eq("user_id", user.id)
-      .eq("status", "accepted");
+      .order("name");
 
     if (error) {
-      toast.error("Failed to load confides");
+      toast.error("Failed to load contacts");
       return;
     }
+    setContacts(data || []);
+  }, [user]);
 
-    setConfides(data as any || []);
+  useEffect(() => {
+    loadContacts();
+  }, [loadContacts]);
+
+  const handleEdit = (contact: Contact) => {
+    setEditingId(contact.id);
+    setEditName(contact.name);
   };
 
-  const handleEdit = (confide: Confide) => {
-    setEditingId(confide.id);
-    setEditAlias(confide.alias || "");
-  };
-
-  const handleSaveAlias = async (confideId: string) => {
+  const handleSaveName = async (contactId: string) => {
+    if (!editName.trim()) {
+      toast.error("Display name cannot be empty");
+      return;
+    }
     setLoading(true);
     try {
       const { error } = await supabase
-        .from("confides")
-        .update({ alias: editAlias || null })
-        .eq("id", confideId);
-
+        .from("fast_encrypt_contacts")
+        .update({ name: editName.trim() })
+        .eq("id", contactId);
       if (error) throw error;
-
-      toast.success("Alias updated successfully");
+      toast.success("Name updated");
       setEditingId(null);
-      loadConfides();
-    } catch (error) {
-      toast.error("Failed to update alias");
+      loadContacts();
+    } catch {
+      toast.error("Failed to update name");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancelEdit = () => {
-    setEditingId(null);
-    setEditAlias("");
-  };
-
-  const handleDeleteClick = (confide: Confide) => {
-    setConfideToDelete({
-      id: confide.id,
-      userId: confide.confide_user_id,
-      displayName: confide.alias || confide.profiles.email,
-    });
+  const handleDeleteClick = (contact: Contact) => {
+    setContactToDelete(contact);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!confideToDelete) return;
-
+    if (!contactToDelete) return;
     setLoading(true);
     try {
-      // Delete both directions of the confide relationship using database function
-      const { error } = await supabase.rpc("delete_confide", {
-        confide_user_id_param: confideToDelete.userId,
-      });
-
+      const { error } = await supabase
+        .from("fast_encrypt_contacts")
+        .delete()
+        .eq("id", contactToDelete.id);
       if (error) throw error;
-
-      toast.success("Confide removed successfully for both users");
+      toast.success("Contact removed");
       setDeleteDialogOpen(false);
-      setConfideToDelete(null);
-      loadConfides();
-    } catch (error) {
-      toast.error("Failed to remove confidee");
+      setContactToDelete(null);
+      loadContacts();
+    } catch {
+      toast.error("Failed to remove contact");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddRecipient = async (email: string, alias?: string) => {
+    if (!user) return;
+    const exists = contacts.some((c) => c.email.toLowerCase() === email.toLowerCase());
+    if (exists) {
+      toast.error("Contact already exists");
+      return;
+    }
+    try {
+      const { error } = await supabase.from("fast_encrypt_contacts").insert({
+        user_id: user.id,
+        email,
+        name: alias || email,
+      });
+      if (error) throw error;
+      toast.success("Contact added");
+      loadContacts();
+    } catch {
+      toast.error("Failed to add contact");
     }
   };
 
@@ -137,74 +136,73 @@ export default function Confides() {
               <Users className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold">Your Confidees</h1>
+          <h1 className="text-3xl font-bold">Your Contacts</h1>
           <p className="text-muted-foreground">
-            Manage your trusted confidee list and set aliases
+            Manage your saved recipients for encrypted messaging
           </p>
-          <Button 
-            onClick={() => navigate("/send-request")} 
+          <Button
+            onClick={() => setShowNewRecipient(true)}
             className="gap-2 mt-4"
             size="lg"
           >
             <UserPlus className="h-5 w-5" />
-            Add Confidee
+            Add New Contact
           </Button>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Confidee List ({confides.length})</CardTitle>
+            <CardTitle>Contact List ({contacts.length})</CardTitle>
             <CardDescription>
-              People you can exchange encrypted messages with
+              People you can send encrypted messages to
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {confides.length === 0 ? (
+            {contacts.length === 0 ? (
               <div className="text-center py-8">
                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No confidees yet</p>
+                <p className="text-muted-foreground">No contacts yet</p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Send a request to add someone to your list
+                  Add a contact to start sending encrypted messages
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
-                {confides.map((confide) => (
+                {contacts.map((contact) => (
                   <div
-                    key={confide.id}
+                    key={contact.id}
                     className="flex items-center justify-between p-4 border rounded-lg"
                   >
                     <div className="flex-1">
-                      {editingId === confide.id ? (
+                      {editingId === contact.id ? (
                         <div className="space-y-2">
                           <Input
-                            placeholder="Enter alias (optional)"
-                            value={editAlias}
-                            onChange={(e) => setEditAlias(e.target.value)}
+                            placeholder="Enter display name"
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleSaveName(contact.id)}
                           />
                           <p className="text-sm text-muted-foreground">
-                            Email: {confide.profiles.email}
+                            {contact.email}
                           </p>
                         </div>
                       ) : (
                         <div>
-                          <p className="font-semibold">
-                            {confide.alias || confide.profiles.email}
-                          </p>
-                          {confide.alias && (
+                          <p className="font-semibold">{contact.name}</p>
+                          {contact.name !== contact.email && (
                             <p className="text-sm text-muted-foreground">
-                              {confide.profiles.email}
+                              {contact.email}
                             </p>
                           )}
                         </div>
                       )}
                     </div>
                     <div className="flex gap-2">
-                      {editingId === confide.id ? (
+                      {editingId === contact.id ? (
                         <>
                           <Button
                             size="sm"
-                            onClick={() => handleSaveAlias(confide.id)}
+                            onClick={() => handleSaveName(contact.id)}
                             disabled={loading}
                             className="gap-2"
                           >
@@ -214,7 +212,7 @@ export default function Confides() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={handleCancelEdit}
+                            onClick={() => setEditingId(null)}
                             disabled={loading}
                           >
                             <X className="h-4 w-4" />
@@ -225,14 +223,14 @@ export default function Confides() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleEdit(confide)}
+                            onClick={() => handleEdit(contact)}
                           >
                             <Edit2 className="h-4 w-4" />
                           </Button>
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() => handleDeleteClick(confide)}
+                            onClick={() => handleDeleteClick(contact)}
                             disabled={loading}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -248,13 +246,19 @@ export default function Confides() {
         </Card>
       </div>
 
+      <NewRecipientDialog
+        open={showNewRecipient}
+        onOpenChange={setShowNewRecipient}
+        onAdd={handleAddRecipient}
+      />
+
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove Confidee?</AlertDialogTitle>
+            <AlertDialogTitle>Remove Contact?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove <strong>{confideToDelete?.displayName}</strong> from your confidee list? 
-              This will remove the confidee relationship for both users and cannot be undone.
+              Are you sure you want to remove <strong>{contactToDelete?.name}</strong> from your contacts?
+              This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

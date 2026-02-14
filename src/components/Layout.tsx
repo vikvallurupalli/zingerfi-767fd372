@@ -9,7 +9,6 @@ import {
   Lock,
   Unlock,
   Users,
-  Send,
   LogOut,
   Shield,
   Settings,
@@ -29,10 +28,9 @@ export function Layout({ children }: LayoutProps) {
 
   const navItems = [
     { path: "/fast-dashboard", icon: Shield, label: "Dashboard" },
-    { path: "/encrypt", icon: Lock, label: "Encrypt" },
-    { path: "/decrypt", icon: Unlock, label: "Decrypt" },
-    { path: "/fast-encrypt", icon: Users, label: "Confides" },
-    { path: "/fast-encrypt", icon: Send, label: "Add Confide" },
+    { path: "/fast-encrypt", icon: Lock, label: "Encrypt" },
+    { path: "/fast-decrypt", icon: Unlock, label: "Decrypt" },
+    { path: "/confides", icon: Users, label: "Confides" },
     { path: "/feedback", icon: MessageSquare, label: "Feedback" },
   ];
 
