@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.fast-decrypt]
 verify_jwt = false
+
+[functions.create-fast-encrypt-payment]
+verify_jwt = false
+
+[functions.record-fast-encrypt-payment]
+verify_jwt = false

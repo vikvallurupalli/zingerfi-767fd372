@@ -235,6 +235,30 @@ export type Database = {
           },
         ]
       }
+      fast_encrypt_unlocks: {
+        Row: {
+          created_at: string
+          cycle_number: number
+          id: string
+          stripe_session_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          cycle_number?: number
+          id?: string
+          stripe_session_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          cycle_number?: number
+          id?: string
+          stripe_session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           admin_notes: string | null
