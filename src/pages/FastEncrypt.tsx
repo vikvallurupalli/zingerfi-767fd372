@@ -14,7 +14,7 @@ import { NewRecipientDialog } from "@/components/NewRecipientDialog";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 // ─── Configurable limits ───
-const FREE_MESSAGE_LIMIT = 50;
+const FREE_MESSAGE_LIMIT = 3;
 const PAID_CYCLE_SIZE = 500;
 
 interface Contact {
